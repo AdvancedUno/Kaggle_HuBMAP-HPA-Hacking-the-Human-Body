@@ -8,6 +8,6 @@
 
 -> My score 0.68, 175th 220826
 
-My goal is to win a bronze medal and a silver medal if it goes well.
+My goal is to win a bronze medal(<100th) and a silver medal(<50th) if it goes well.
 
 
