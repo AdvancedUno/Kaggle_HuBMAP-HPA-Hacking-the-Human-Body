@@ -12,4 +12,6 @@ My goal is to win a 🥉 and a 🥈 if it goes well.
 
 trying pixel_size & np.float32/255 ... 220829
 
+trying stain h&e & out of mmseg & to scratch... 220830
+
 
