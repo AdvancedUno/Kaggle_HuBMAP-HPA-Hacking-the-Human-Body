@@ -10,7 +10,7 @@
 
 -> My score 0.73, 175th 220830
 
-My goal is to win a 🥉 or a 🥈 if it goes well.
+My goal is a 🥉. If it goes well, 🥈
 
 trying pixel_size & np.float32/255 (segformer_b5)... 220829
 
