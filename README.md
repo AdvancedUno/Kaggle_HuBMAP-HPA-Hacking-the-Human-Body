@@ -16,4 +16,5 @@ trying pixel_size & np.float32/255 (segformer_b5)... 220829
 
 trying stain h&e & out of mmseg & to scratch(segformer_b5)... 220830
 
-
+i tried some augmentation about color because hpa & hubmap is diffent about color 
+it is meaningful... 220830
