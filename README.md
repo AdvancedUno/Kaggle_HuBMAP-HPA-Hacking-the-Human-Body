@@ -10,6 +10,8 @@
 
 -> My score 0.73, 175th 220830
 
+-> My score 0.74, 210th 220903
+
 My goal is a 🥉. If it goes well, 🥈
 
 trying pixel_size & np.float32/255 (segformer_b5)... 220829
@@ -18,3 +20,5 @@ trying stain h&e & out of mmseg & to scratch(segformer_b5)... 220830
 
 i tried some augmentation about color because hpa & hubmap is diffent about color 
 it is meaningful... 220830
+
+i apply pixel_size augmentation but it be ineffective... 220903
