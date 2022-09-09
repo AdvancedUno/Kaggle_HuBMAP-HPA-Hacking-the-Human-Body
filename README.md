@@ -23,6 +23,8 @@ it is meaningful... 220830
 
 i apply pixel_size augmentation but it be ineffective... 220903
 
-about tiling... 220909
+about tiling
 
 [Systematic Evaluation of Image Tiling Adverse Effects on Deep Learning Semantic Segmentation](https://www.frontiersin.org/articles/10.3389/fnins.2020.00065/full)
+
+i trying batch_size, loss fuction, augmentation... 220909
