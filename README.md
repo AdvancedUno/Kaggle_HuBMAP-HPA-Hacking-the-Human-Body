@@ -22,3 +22,6 @@ i tried some augmentation about color because hpa & hubmap is diffent about colo
 it is meaningful... 220830
 
 i apply pixel_size augmentation but it be ineffective... 220903
+
+about tiling... 220909
+[Systematic Evaluation of Image Tiling Adverse Effects on Deep Learning Semantic Segmentation](https://www.frontiersin.org/articles/10.3389/fnins.2020.00065/full)
