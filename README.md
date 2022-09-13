@@ -30,3 +30,5 @@ about tiling
 i trying batch_size, loss fuction, augmentation... 220909
 
 changed decoder-head to mixupsample... 220910
+
+studying swa... 220913
