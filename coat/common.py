@@ -11,6 +11,7 @@ import time
 import datetime
 from torch.utils.data import RandomSampler 
 from torch.utils.data import SequentialSampler
+import os
 
 tensor_list = ['mask', 'image', 'organ']
 

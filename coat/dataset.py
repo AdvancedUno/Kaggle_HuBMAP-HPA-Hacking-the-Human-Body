@@ -3,13 +3,13 @@ from common import *
 from sklearn.model_selection import KFold
 from augmentation import *
 
-
 image_size = 768 
 
-
+TRAIN = '/kaggle/input/hubmap-organ-segmentation/train_images/'
+MASKS = '/kaggle/input/hubmap-768-mask-01/'
 #------------------------------
 def make_fold(fold=0):
-	df = pd.read_csv(root_dir + '/data/hubmap-organ-segmentation/train.csv')
+	df = pd.read_csv('/kaggle/input/hubmap-organ-segmentation/train.csv')
 	
 	num_fold = 5
 	skf = KFold(n_splits=num_fold, shuffle=True,random_state=42)

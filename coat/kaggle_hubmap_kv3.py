@@ -5,28 +5,38 @@ import pandas as pd
 import math
 import numpy as np
 
-organ_meta = dict(
-	kidney = dict(
+class dotdict(dict):
+	__setattr__ = dict.__setitem__
+	__delattr__ = dict.__delitem__
+	
+	def __getattr__(self, name):
+		try:
+			return self[name]
+		except KeyError:
+			raise AttributeError(name)
+
+organ_meta = dotdict(
+	kidney = dotdict(
 		label = 1,
 		um    = 0.5000,
 		ftu   ='glomeruli',
 	),
-	prostate = dict(
+	prostate = dotdict(
 		label = 2,
 		um    = 6.2630,
 		ftu   ='glandular acinus',
 	),
-	largeintestine = dict(
+	largeintestine = dotdict(
 		label = 3,
 		um    = 0.2290,
 		ftu   ='crypt',
 	),
-	spleen = dict(
+	spleen = dotdict(
 		label = 4,
 		um    = 0.4945,
 		ftu   ='white pulp',
 	),
-	lung = dict(
+	lung = dotdict(
 		label = 5,
 		um    = 0.7562,
 		ftu   ='alveolus',

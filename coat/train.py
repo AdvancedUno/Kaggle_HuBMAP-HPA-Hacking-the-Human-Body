@@ -1,6 +1,5 @@
 import os
 
-
 from common  import *
 from model import *
 from dataset import *
@@ -72,14 +71,14 @@ def do_valid(net, valid_loader):
 
 
     dice = dice.mean()
-    print(dice)
+
     return [dice, loss,  0, 0]
 
 
 def run_train():
     fold = 3
 
-    out_dir = root_dir + '/result/run20/segformer-mit-b2-aux5-768/fold-%d' % (fold)
+    out_dir =  'kaggle/working/result/run20/segformer-mit-b2-aux5-768/fold-%d' % (fold)
     initial_checkpoint = None # out_dir + '/checkpoint/00001925.model.pth'  #
     #None #
 
@@ -157,10 +156,9 @@ def run_train():
     log.write('\n')
 
     num_iteration = 1000*len(train_loader)
-    print(num_iteration)
     iter_log   = len(train_loader)*1 #479
     iter_valid = iter_log
-    iter_save  = iter_log*5
+    iter_save  = iter_log
 
     ## start training here! ##############################################
     #array([0.57142857, 0.42857143])
@@ -211,7 +209,7 @@ def run_train():
 
 
             if iteration%iter_save==0:
-                if iteration != start_iteration:
+                if iteration != start_iteration and iteration > 1400:
                     torch.save({
                         'state_dict': net.state_dict(),
                         'iteration': iteration,

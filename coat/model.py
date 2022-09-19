@@ -3,9 +3,9 @@ from daformer import *
 from coat import *
 
 class RGB(nn.Module):
-	IMAGE_RGB_MEAN = [0.485, 0.456, 0.406]  # [0.5, 0.5, 0.5]
-	IMAGE_RGB_STD = [0.229, 0.224, 0.225]  # [0.5, 0.5, 0.5]
-	
+	IMAGE_RGB_MEAN = [0.7720342, 0.74582646, 0.76392896]  # [0.5, 0.5, 0.5]
+	IMAGE_RGB_STD = [0.24745085, 0.26182273, 0.25782376]  # [0.5, 0.5, 0.5]
+
 	def __init__(self, ):
 		super(RGB, self).__init__()
 		self.register_buffer('mean', torch.zeros(1, 3, 1, 1))
