@@ -12,6 +12,8 @@
 
 -> My score 0.74, 210th 220903
 
+-> My score 0.79 89th 220921
+
 My goal is a 🥉. If it goes well, 🥈
 
 trying pixel_size & np.float32/255 (segformer_b5)... 220829
@@ -34,3 +36,9 @@ changed decoder-head to mixupsample... 220910
 studying swa... 220913
 
 train with coat... 220919
+
+i train almost 48 hour two model
+0.4 normalise and 0.7 normalise 
+i got hubmap 0.58 hpa 0.21
+My score 0.79++
+i'm looking for hpa 22 or 23 model ... 220921
