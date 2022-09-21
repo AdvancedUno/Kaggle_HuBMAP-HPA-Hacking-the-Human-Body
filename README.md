@@ -12,7 +12,7 @@
 
 -> My score 0.74, 210th 220903
 
--> My score 0.79 89th 220921
+-> My score 0.79 89th 220921 🥉
 
 My goal is a 🥉. If it goes well, 🥈
 
