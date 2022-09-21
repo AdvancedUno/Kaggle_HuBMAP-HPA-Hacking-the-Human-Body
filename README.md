@@ -38,7 +38,11 @@ studying swa... 220913
 train with coat... 220919
 
 i train almost 48 hour two model
+
 0.4 normalise and 0.7 normalise 
+
 i got hubmap 0.58 hpa 0.21
+
 My score 0.79++
+
 i'm looking for hpa 22 or 23 model ... 220921
