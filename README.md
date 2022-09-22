@@ -46,3 +46,7 @@ i got hubmap 0.58 hpa 0.21
 My score 0.79++
 
 i'm looking for hpa 22 or 23 model ... 220921
+
+last day i train another model normalise 0.8~
+
+and finding best thershold... 220922
