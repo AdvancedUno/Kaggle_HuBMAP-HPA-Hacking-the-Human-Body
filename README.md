@@ -14,6 +14,8 @@
 
 -> My score 0.79 89th 220921 🥉
 
+-> My score 0.80 97th 220923 🥉
+
 My goal is a 🥉. If it goes well, 🥈
 
 trying pixel_size & np.float32/255 (segformer_b5)... 220829
@@ -50,3 +52,5 @@ i'm looking for hpa 22 or 23 model ... 220921
 last day i train another model normalise 0.8~
 
 and finding best thershold... 220922
+
+i got 0.80 with three ensemble... 220923
