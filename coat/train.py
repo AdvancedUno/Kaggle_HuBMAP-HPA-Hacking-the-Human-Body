@@ -3,7 +3,7 @@ import os
 from common  import *
 from model import *
 from dataset import *
-
+from torchcontrib.optim import SWA
 import torch.cuda.amp as amp
 is_amp = True 
 
@@ -82,7 +82,7 @@ def run_train():
     initial_checkpoint = None # out_dir + '/checkpoint/00001925.model.pth'  #
     #None #
 
-    start_lr   = 5e-5 #0.0001
+    start_lr   = 2e-5 #0.0001
     batch_size = 4 #32 #32
 
     for f in ['checkpoint','train','valid','backup'] : os.makedirs(out_dir +'/'+f, exist_ok=True)
@@ -91,7 +91,9 @@ def run_train():
 
     train_df, valid_df = make_fold(fold)
 
-    train_dataset = CustomDataset(train_df, "train", train_augment5b) #HubmapDataset(train_df, train_augment5b)
+    df = pd.read_csv('/kaggle/input/hubmapdatasom/hubmap-organ-segmentation/train.csv')
+
+    train_dataset = CustomDataset(df, "train", train_augment5b) #HubmapDataset(train_df, train_augment5b)
     valid_dataset = CustomDataset(valid_df, "test", valid_augment5) #HubmapDataset(valid_df, valid_augment5)
     
     
@@ -149,6 +151,7 @@ def run_train():
     #-----------------------------------------------
 
     optimizer = torch.optim.AdamW(filter(lambda p: p.requires_grad, net.parameters()), lr=start_lr)
+    # optimizer = SWA(optimizer, 1400, 700, 0.00005)
     #optimizer = Lookahead(RAdam(filter(lambda p: p.requires_grad, net.parameters()),lr=start_lr), alpha=0.5, k=5)
 
     
@@ -210,6 +213,8 @@ def run_train():
 
             if iteration%iter_save==0:
                 if iteration != start_iteration and iteration > 1400:
+                    # if iteration > 4549:
+                    #     optimizer.swap_swa_sgd()
                     torch.save({
                         'state_dict': net.state_dict(),
                         'iteration': iteration,
@@ -225,7 +230,8 @@ def run_train():
 
 
             if (iteration%iter_log==0) or (iteration%iter_valid==0):
-                print('\r', end='', flush=True)
+                #print('\r', end='', flush=True)
+                print('\n')
                 log.write(message(mode='log') + '\n')
 
 

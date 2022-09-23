@@ -3,9 +3,12 @@ from daformer import *
 from coat import *
 
 class RGB(nn.Module):
-	IMAGE_RGB_MEAN = [0.7720342, 0.74582646, 0.76392896]  # [0.5, 0.5, 0.5]
-	IMAGE_RGB_STD = [0.24745085, 0.26182273, 0.25782376]  # [0.5, 0.5, 0.5]
-
+	# IMAGE_RGB_MEAN = [0.7720342, 0.74582646, 0.76392896]  
+	# IMAGE_RGB_STD = [0.24745085, 0.26182273, 0.25782376]  
+	# IMAGE_RGB_MEAN = [0.485, 0.456, 0.406]  
+	# IMAGE_RGB_STD = [0.229, 0.224, 0.225]
+	IMAGE_RGB_MEAN=[0.8384076, 0.8144838, 0.8313765]
+	IMAGE_RGB_STD=[0.15101613, 0.17479536, 0.1570855]
 	def __init__(self, ):
 		super(RGB, self).__init__()
 		self.register_buffer('mean', torch.zeros(1, 3, 1, 1))
@@ -35,6 +38,20 @@ def init_weight(m):
             m.bias.data.zero_()
     elif classname.find('Embedding') != -1:
         nn.init.orthogonal_(m.weight, gain=1)
+		
+# def init_model():
+#     encoder = coat_parallel_small_plus()
+#     checkpoint = '../input/hubmapsmall/coat_small_7479cf9b.pth'
+#     checkpoint = torch.load(checkpoint, map_location=lambda storage, loc: storage)
+#     state_dict = checkpoint['model']
+#     encoder.load_state_dict(state_dict,strict=False)
+
+#     model = Net(encoder=encoder).cuda()
+
+# 	checkpoint = '../input/inference-cfg/65model.pth'
+# 	model.load_state_dict(torch.load(checkpoint)['state_dict'])
+
+# 	return model
 
 def init_model():
     encoder = coat_parallel_small_plus()
@@ -44,17 +61,13 @@ def init_model():
     encoder.load_state_dict(state_dict,strict=False)
 
     model = Net(encoder=encoder).cuda()
+
+    checkpoint = '../input/coattrain/00004698.model.pth'
+    model.load_state_dict(torch.load(checkpoint)['state_dict'])
     
     return model
 
 class Net(nn.Module):
-	# def load_pretrain( self,):
-	# 	path =  '/home/jupyter/share/WRQ/Hubmap/input/coat_lite_medium/coat_lite_medium_384x384_f9129688.pth'
-	# 	checkpoint = torch.load(path, map_location=lambda storage, loc: storage)
-	# 	self.state_dict = checkpoint['model']
-	# 	self.encoder.load_state_dict(checkpoint,strict=False)
-
-
 	def __init__(self,
 	             
 	             decoder=daformer_conv1x1,
@@ -68,7 +81,6 @@ class Net(nn.Module):
 		# ----
 		self.output_type = ['inference', 'loss']
 		
-
 		self.rgb = RGB()
 
 		self.encoder = encoder
@@ -100,17 +112,11 @@ class Net(nn.Module):
 	
 
 	def forward(self, batch):
-		
 		x = batch['image']
-		
-		num_class = 5
-
-
 		x = self.rgb(x)
 		
 		B, C, H, W = x.shape
 
-        
 		encoder = self.encoder(x)
 
 		last, decoder = self.decoder(encoder)

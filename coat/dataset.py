@@ -5,11 +5,11 @@ from augmentation import *
 
 image_size = 768 
 
-TRAIN = '/kaggle/input/hubmap-organ-segmentation/train_images/'
-MASKS = '/kaggle/input/hubmap-768-mask-01/'
+TRAIN = '/kaggle/input/hubmapdatasom/hubmap-organ-segmentation/train_images/'
+MASKS = '/kaggle/input/hubmap-768-mask-01/masks/'
 #------------------------------
 def make_fold(fold=0):
-	df = pd.read_csv('/kaggle/input/hubmap-organ-segmentation/train.csv')
+	df = pd.read_csv('/kaggle/input/hubmapdatasom/hubmap-organ-segmentation/train.csv')
 	
 	num_fold = 5
 	skf = KFold(n_splits=num_fold, shuffle=True,random_state=42)
@@ -133,13 +133,13 @@ def train_augment5b(image, mask, organ):
     for fn in np.random.choice([
         lambda image, mask: (image, mask),
         lambda image, mask: do_random_noise(image, mask, mag=0.1),
-        lambda image, mask: do_random_contast(image, mask, mag=0.40),
-        lambda image, mask: do_random_hsv(image, mask, mag=[0.40, 0.40, 0])
+        # lambda image, mask: do_random_contast(image, mask, mag=0.40),
+        # lambda image, mask: do_random_hsv(image, mask, mag=[0.40, 0.40, 0])
     ], 2): image, mask = fn(image, mask)
 
     for fn in np.random.choice([
         lambda image, mask: (image, mask),
-        lambda image, mask: do_random_rotate_scale(image, mask, angle=45, scale=[0.50, 2.0]),
+        lambda image, mask: do_random_rotate_scale(image, mask, angle=45, scale=[1, 1]),
     ], 1): image, mask = fn(image, mask)
 
     return image, mask
