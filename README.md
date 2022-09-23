@@ -14,7 +14,13 @@
 
 -> My score 0.79 89th 220921 🥉
 
--> My score 0.80 97th 220923 🥉
+-> My score 0.80 97th 220922 🥉
+
+🔥 Private Score
+
+<img width="1045" alt="스크린샷 2022-09-23 오전 9 17 03" src="https://user-images.githubusercontent.com/79159191/191872451-f1b2c1d6-f20f-4ace-b992-f12c2aa758e7.png">
+
+
 
 My goal is a 🥉. If it goes well, 🥈
 
@@ -53,4 +59,6 @@ last day i train another model normalise 0.8~
 
 and finding best thershold... 220922
 
-i got 0.80 with three ensemble... 220923
+i got 0.80 with three ensemble... 220922
+
+
