@@ -1,0 +1,2163 @@
+2022-09-16 16:04:59,056 - mmseg - INFO - Multi-processing start method is `None`
+2022-09-16 16:04:59,058 - mmseg - INFO - OpenCV num_threads is `2
+2022-09-16 16:04:59,157 - mmseg - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.7.12 | packaged by conda-forge | (default, Oct 26 2021, 06:08:53) [GCC 9.4.0]
+CUDA available: True
+GPU 0: Tesla P100-PCIE-16GB
+CUDA_HOME: /usr/local/cuda
+NVCC: Cuda compilation tools, release 11.0, V11.0.221
+GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+PyTorch: 1.11.0
+PyTorch compiling details: PyTorch built with:
+  - GCC 9.4
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2022.0-Product Build 20211112 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v2.5.2 (Git Hash a9302535553c73243c632ad3c4c80beec3d19a1e)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: AVX512
+  - CUDA Runtime 11.0
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_70,code=compute_70;-gencode;arch=compute_75,code=compute_75
+  - CuDNN 8.0.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.0, CUDNN_VERSION=8.0.5, CXX_COMPILER=/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -DEDGE_PROFILER_USE_KINETO -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Werror=cast-function-type -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.11.0, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=OFF, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, 
+
+TorchVision: 0.12.0
+OpenCV: 4.5.4
+MMCV: 1.5.3
+MMCV Compiler: GCC 9.4
+MMCV CUDA Compiler: 11.0
+MMSegmentation: 0.26.0+
+------------------------------------------------------------
+
+2022-09-16 16:04:59,157 - mmseg - INFO - Distributed training: False
+2022-09-16 16:05:00,718 - mmseg - INFO - Config:
+norm_cfg = dict(type='SyncBN', requires_grad=True)
+model = dict(
+    type='EncoderDecoder',
+    pretrained=
+    'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth',
+    backbone=dict(
+        type='MixVisionTransformer',
+        in_channels=3,
+        embed_dims=64,
+        num_stages=4,
+        num_layers=[3, 4, 6, 3],
+        num_heads=[1, 2, 5, 8],
+        patch_sizes=[7, 3, 3, 3],
+        sr_ratios=[8, 4, 2, 1],
+        out_indices=(0, 1, 2, 3),
+        mlp_ratio=4,
+        qkv_bias=True,
+        drop_rate=0.0,
+        attn_drop_rate=0.0,
+        drop_path_rate=0.1),
+    decode_head=dict(
+        type='SegformerHead',
+        in_channels=[64, 128, 320, 512],
+        in_index=[0, 1, 2, 3],
+        channels=256,
+        dropout_ratio=0.1,
+        num_classes=6,
+        norm_cfg=dict(type='SyncBN', requires_grad=True),
+        align_corners=False,
+        loss_decode=dict(
+            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
+    train_cfg=dict(),
+    test_cfg=dict(mode='whole'))
+log_config = dict(
+    interval=50, hooks=[dict(type='TextLoggerHook', by_epoch=False)])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = '../input/model/iter_10001.pth'
+resume_from = None
+workflow = [('train', 1)]
+cudnn_benchmark = True
+optimizer = dict(
+    type='AdamW',
+    lr=6e-05,
+    betas=(0.9, 0.999),
+    weight_decay=0.01,
+    paramwise_cfg=dict(
+        custom_keys=dict(
+            pos_block=dict(decay_mult=0.0),
+            norm=dict(decay_mult=0.0),
+            head=dict(lr_mult=10.0))))
+optimizer_config = dict()
+lr_config = dict(
+    policy='poly',
+    warmup='linear',
+    warmup_iters=1500,
+    warmup_ratio=1e-06,
+    power=1.0,
+    min_lr=0.0,
+    by_epoch=False)
+runner = dict(type='IterBasedRunner', max_iters=10000)
+checkpoint_config = dict(by_epoch=False, interval=500000)
+evaluation = dict(interval=1000, metric='mDice', pre_eval=True)
+checkpoint = 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth'
+data = dict(
+    samples_per_gpu=4,
+    workers_per_gpu=2,
+    train=dict(
+        type='CustomDataset',
+        data_root='../input/multiclasses',
+        img_dir='multi_classes/imgs',
+        ann_dir='multi_classes/masks',
+        img_suffix='.png',
+        seg_map_suffix='.png',
+        split='splits/fold_3.txt',
+        classes=[
+            'background', 'kidney', 'prostate', 'largeintestine', 'spleen',
+            'lung'
+        ],
+        palette=[[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255],
+                 [255, 255, 0], [255, 0, 255]],
+        pipeline=[
+            dict(type='LoadAnnotations'),
+            dict(type='LoadImageFromFile'),
+            dict(type='RandomFlip', prob=0.5, direction='horizontal'),
+            dict(type='RandomFlip', prob=0.5, direction='vertical'),
+            dict(
+                type='Normalize',
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225],
+                arg=True),
+            dict(type='DefaultFormatBundle'),
+            dict(type='Collect', keys=['img', 'gt_semantic_seg'])
+        ]),
+    val=dict(
+        type='CustomDataset',
+        data_root='../input/multiclasses',
+        img_dir='multi_classes/imgs',
+        ann_dir='multi_classes/masks',
+        img_suffix='.png',
+        seg_map_suffix='.png',
+        split='splits/valid_3.txt',
+        classes=[
+            'background', 'kidney', 'prostate', 'largeintestine', 'spleen',
+            'lung'
+        ],
+        palette=[[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255],
+                 [255, 255, 0], [255, 0, 255]],
+        pipeline=[
+            dict(type='LoadImageFromFile', to_float32=False),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(768, 768),
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[0.485, 0.456, 0.406],
+                        std=[0.229, 0.224, 0.225]),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CustomDataset',
+        data_root='../input/multiclasses',
+        test_mode=True,
+        img_dir='multi_classes/imgs',
+        ann_dir='multi_classes/masks',
+        img_suffix='.png',
+        seg_map_suffix='.png',
+        classes=[
+            'background', 'kidney', 'prostate', 'largeintestine', 'spleen',
+            'lung'
+        ],
+        palette=[[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255],
+                 [255, 255, 0], [255, 0, 255]],
+        pipeline=[
+            dict(type='LoadImageFromFile', to_float32=False),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(768, 768),
+                flip=True,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[0.485, 0.456, 0.406],
+                        std=[0.229, 0.224, 0.225]),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+decode_head = dict(
+    loss_decode=dict(type='Diceloss', use_sigmoid=False, loss_weight=1.0))
+auxiliary_head = dict(
+    loss_decode=dict(type='Diceloss', use_sigmoid=False, loss_weight=1.0))
+swa_start = 0
+swa_freq = 350
+swa_lr = 5e-05
+dataset_type = 'CustomDataset'
+data_root = '../input/multiclasses'
+classes = [
+    'background', 'kidney', 'prostate', 'largeintestine', 'spleen', 'lung'
+]
+palette = [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [255, 255, 0],
+           [255, 0, 255]]
+img_norm_cfg = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+size = 768
+train_pipeline = [
+    dict(type='LoadAnnotations'),
+    dict(type='LoadImageFromFile'),
+    dict(type='RandomFlip', prob=0.5, direction='horizontal'),
+    dict(type='RandomFlip', prob=0.5, direction='vertical'),
+    dict(
+        type='Normalize',
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225],
+        arg=True),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_semantic_seg'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile', to_float32=False),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(768, 768),
+        flip=True,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+work_dir = './work_dirs/config'
+gpu_ids = [0]
+auto_resume = False
+
+2022-09-16 16:05:00,719 - mmseg - INFO - Set random seed to 1988671651, deterministic: False
+2022-09-16 16:05:01,115 - mmseg - INFO - initialize MixVisionTransformer with init_cfg {'type': 'Pretrained', 'checkpoint': 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth'}
+2022-09-16 16:05:13,006 - mmseg - INFO - initialize SegformerHead with init_cfg {'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+Name of parameter - Initialization information
+
+backbone.layers.0.0.projection.weight - torch.Size([64, 3, 7, 7]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.0.projection.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.0.norm.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.0.norm.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.norm1.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.norm1.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.attn.in_proj_weight - torch.Size([192, 64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.attn.in_proj_bias - torch.Size([192]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.attn.out_proj.weight - torch.Size([64, 64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.attn.out_proj.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.sr.weight - torch.Size([64, 64, 8, 8]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.sr.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.norm.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.attn.norm.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.norm2.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.norm2.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.ffn.layers.0.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.ffn.layers.0.bias - torch.Size([256]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.ffn.layers.1.weight - torch.Size([256, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.ffn.layers.1.bias - torch.Size([256]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.ffn.layers.4.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.0.ffn.layers.4.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.norm1.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.norm1.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.attn.in_proj_weight - torch.Size([192, 64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.attn.in_proj_bias - torch.Size([192]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.attn.out_proj.weight - torch.Size([64, 64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.attn.out_proj.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.sr.weight - torch.Size([64, 64, 8, 8]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.sr.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.norm.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.attn.norm.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.norm2.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.norm2.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.ffn.layers.0.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.ffn.layers.0.bias - torch.Size([256]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.ffn.layers.1.weight - torch.Size([256, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.ffn.layers.1.bias - torch.Size([256]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.ffn.layers.4.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.1.ffn.layers.4.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.norm1.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.norm1.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.attn.in_proj_weight - torch.Size([192, 64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.attn.in_proj_bias - torch.Size([192]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.attn.out_proj.weight - torch.Size([64, 64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.attn.out_proj.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.sr.weight - torch.Size([64, 64, 8, 8]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.sr.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.norm.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.attn.norm.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.norm2.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.norm2.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.ffn.layers.0.weight - torch.Size([256, 64, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.ffn.layers.0.bias - torch.Size([256]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.ffn.layers.1.weight - torch.Size([256, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.ffn.layers.1.bias - torch.Size([256]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.ffn.layers.4.weight - torch.Size([64, 256, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.1.2.ffn.layers.4.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.2.weight - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.0.2.bias - torch.Size([64]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.0.projection.weight - torch.Size([128, 64, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.0.projection.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.0.norm.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.0.norm.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.norm1.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.norm1.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.attn.in_proj_weight - torch.Size([384, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.attn.in_proj_bias - torch.Size([384]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.attn.out_proj.weight - torch.Size([128, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.attn.out_proj.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.sr.weight - torch.Size([128, 128, 4, 4]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.sr.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.norm.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.attn.norm.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.ffn.layers.0.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.ffn.layers.0.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.ffn.layers.1.weight - torch.Size([512, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.ffn.layers.1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.ffn.layers.4.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.0.ffn.layers.4.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.norm1.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.norm1.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.attn.in_proj_weight - torch.Size([384, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.attn.in_proj_bias - torch.Size([384]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.attn.out_proj.weight - torch.Size([128, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.attn.out_proj.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.sr.weight - torch.Size([128, 128, 4, 4]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.sr.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.norm.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.attn.norm.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.ffn.layers.0.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.ffn.layers.0.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.ffn.layers.1.weight - torch.Size([512, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.ffn.layers.1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.ffn.layers.4.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.1.ffn.layers.4.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.norm1.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.norm1.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.attn.in_proj_weight - torch.Size([384, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.attn.in_proj_bias - torch.Size([384]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.attn.out_proj.weight - torch.Size([128, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.attn.out_proj.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.sr.weight - torch.Size([128, 128, 4, 4]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.sr.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.norm.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.attn.norm.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.ffn.layers.0.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.ffn.layers.0.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.ffn.layers.1.weight - torch.Size([512, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.ffn.layers.1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.ffn.layers.4.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.2.ffn.layers.4.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.norm1.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.norm1.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.attn.in_proj_weight - torch.Size([384, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.attn.in_proj_bias - torch.Size([384]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.attn.out_proj.weight - torch.Size([128, 128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.attn.out_proj.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.sr.weight - torch.Size([128, 128, 4, 4]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.sr.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.norm.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.attn.norm.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.norm2.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.norm2.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.ffn.layers.0.weight - torch.Size([512, 128, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.ffn.layers.0.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.ffn.layers.1.weight - torch.Size([512, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.ffn.layers.1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.ffn.layers.4.weight - torch.Size([128, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.1.3.ffn.layers.4.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.2.weight - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.1.2.bias - torch.Size([128]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.0.projection.weight - torch.Size([320, 128, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.0.projection.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.0.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.0.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.attn.in_proj_weight - torch.Size([960, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.attn.in_proj_bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.attn.out_proj.weight - torch.Size([320, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.attn.out_proj.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.sr.weight - torch.Size([320, 320, 2, 2]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.sr.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.attn.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.ffn.layers.0.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.ffn.layers.0.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.ffn.layers.1.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.ffn.layers.1.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.ffn.layers.4.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.0.ffn.layers.4.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.attn.in_proj_weight - torch.Size([960, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.attn.in_proj_bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.attn.out_proj.weight - torch.Size([320, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.attn.out_proj.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.sr.weight - torch.Size([320, 320, 2, 2]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.sr.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.attn.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.ffn.layers.0.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.ffn.layers.0.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.ffn.layers.1.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.ffn.layers.1.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.ffn.layers.4.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.1.ffn.layers.4.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.attn.in_proj_weight - torch.Size([960, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.attn.in_proj_bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.attn.out_proj.weight - torch.Size([320, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.attn.out_proj.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.sr.weight - torch.Size([320, 320, 2, 2]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.sr.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.attn.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.ffn.layers.0.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.ffn.layers.0.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.ffn.layers.1.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.ffn.layers.1.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.ffn.layers.4.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.2.ffn.layers.4.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.attn.in_proj_weight - torch.Size([960, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.attn.in_proj_bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.attn.out_proj.weight - torch.Size([320, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.attn.out_proj.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.sr.weight - torch.Size([320, 320, 2, 2]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.sr.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.attn.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.ffn.layers.0.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.ffn.layers.0.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.ffn.layers.1.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.ffn.layers.1.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.ffn.layers.4.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.3.ffn.layers.4.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.attn.in_proj_weight - torch.Size([960, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.attn.in_proj_bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.attn.out_proj.weight - torch.Size([320, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.attn.out_proj.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.sr.weight - torch.Size([320, 320, 2, 2]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.sr.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.attn.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.ffn.layers.0.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.ffn.layers.0.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.ffn.layers.1.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.ffn.layers.1.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.ffn.layers.4.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.4.ffn.layers.4.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.norm1.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.norm1.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.attn.in_proj_weight - torch.Size([960, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.attn.in_proj_bias - torch.Size([960]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.attn.out_proj.weight - torch.Size([320, 320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.attn.out_proj.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.sr.weight - torch.Size([320, 320, 2, 2]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.sr.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.norm.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.attn.norm.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.norm2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.norm2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.ffn.layers.0.weight - torch.Size([1280, 320, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.ffn.layers.0.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.ffn.layers.1.weight - torch.Size([1280, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.ffn.layers.1.bias - torch.Size([1280]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.ffn.layers.4.weight - torch.Size([320, 1280, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.1.5.ffn.layers.4.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.2.weight - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.2.2.bias - torch.Size([320]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.0.projection.weight - torch.Size([512, 320, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.0.projection.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.0.norm.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.0.norm.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.norm1.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.norm1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.attn.attn.in_proj_weight - torch.Size([1536, 512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.attn.attn.in_proj_bias - torch.Size([1536]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.attn.attn.out_proj.weight - torch.Size([512, 512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.attn.attn.out_proj.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.norm2.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.norm2.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.ffn.layers.0.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.ffn.layers.0.bias - torch.Size([2048]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.ffn.layers.1.weight - torch.Size([2048, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.ffn.layers.1.bias - torch.Size([2048]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.ffn.layers.4.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.0.ffn.layers.4.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.norm1.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.norm1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.attn.attn.in_proj_weight - torch.Size([1536, 512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.attn.attn.in_proj_bias - torch.Size([1536]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.attn.attn.out_proj.weight - torch.Size([512, 512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.attn.attn.out_proj.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.norm2.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.norm2.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.ffn.layers.0.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.ffn.layers.0.bias - torch.Size([2048]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.ffn.layers.1.weight - torch.Size([2048, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.ffn.layers.1.bias - torch.Size([2048]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.ffn.layers.4.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.1.ffn.layers.4.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.norm1.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.norm1.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.attn.attn.in_proj_weight - torch.Size([1536, 512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.attn.attn.in_proj_bias - torch.Size([1536]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.attn.attn.out_proj.weight - torch.Size([512, 512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.attn.attn.out_proj.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.norm2.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.norm2.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.ffn.layers.0.weight - torch.Size([2048, 512, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.ffn.layers.0.bias - torch.Size([2048]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.ffn.layers.1.weight - torch.Size([2048, 1, 3, 3]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.ffn.layers.1.bias - torch.Size([2048]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.ffn.layers.4.weight - torch.Size([512, 2048, 1, 1]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.1.2.ffn.layers.4.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.2.weight - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+backbone.layers.3.2.bias - torch.Size([512]): 
+PretrainedInit: load from https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth 
+
+decode_head.conv_seg.weight - torch.Size([6, 256, 1, 1]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.conv_seg.bias - torch.Size([6]): 
+NormalInit: mean=0, std=0.01, bias=0 
+
+decode_head.convs.0.0.conv.weight - torch.Size([256, 64, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.0.0.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.0.0.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.1.0.conv.weight - torch.Size([256, 128, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.1.0.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.1.0.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.1.1.mixing - torch.Size([]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.2.0.conv.weight - torch.Size([256, 320, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.2.0.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.2.0.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.2.1.mixing - torch.Size([]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.3.0.conv.weight - torch.Size([256, 512, 1, 1]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.3.0.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.3.0.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.convs.3.1.mixing - torch.Size([]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fusion_conv.conv.weight - torch.Size([256, 1024, 1, 1]): 
+Initialized by user-defined `init_weights` in ConvModule  
+
+decode_head.fusion_conv.bn.weight - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+
+decode_head.fusion_conv.bn.bias - torch.Size([256]): 
+The value is the same before and after calling `init_weights` of EncoderDecoder  
+2022-09-16 16:05:13,018 - mmseg - INFO - EncoderDecoder(
+  (backbone): MixVisionTransformer(
+    (layers): ModuleList(
+      (0): ModuleList(
+        (0): PatchEmbed(
+          (projection): Conv2d(3, 64, kernel_size=(7, 7), stride=(4, 4), padding=(3, 3))
+          (norm): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+        )
+        (1): ModuleList(
+          (0): TransformerEncoderLayer(
+            (norm1): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(64, 64, kernel_size=(8, 8), stride=(8, 8))
+              (norm): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (1): TransformerEncoderLayer(
+            (norm1): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(64, 64, kernel_size=(8, 8), stride=(8, 8))
+              (norm): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (2): TransformerEncoderLayer(
+            (norm1): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(64, 64, kernel_size=(8, 8), stride=(8, 8))
+              (norm): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=256)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(256, 64, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+        )
+        (2): LayerNorm((64,), eps=1e-06, elementwise_affine=True)
+      )
+      (1): ModuleList(
+        (0): PatchEmbed(
+          (projection): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+          (norm): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+        )
+        (1): ModuleList(
+          (0): TransformerEncoderLayer(
+            (norm1): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(128, 128, kernel_size=(4, 4), stride=(4, 4))
+              (norm): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (1): TransformerEncoderLayer(
+            (norm1): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(128, 128, kernel_size=(4, 4), stride=(4, 4))
+              (norm): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (2): TransformerEncoderLayer(
+            (norm1): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(128, 128, kernel_size=(4, 4), stride=(4, 4))
+              (norm): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (3): TransformerEncoderLayer(
+            (norm1): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=128, out_features=128, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(128, 128, kernel_size=(4, 4), stride=(4, 4))
+              (norm): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(128, 512, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=512)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(512, 128, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+        )
+        (2): LayerNorm((128,), eps=1e-06, elementwise_affine=True)
+      )
+      (2): ModuleList(
+        (0): PatchEmbed(
+          (projection): Conv2d(128, 320, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+          (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+        )
+        (1): ModuleList(
+          (0): TransformerEncoderLayer(
+            (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=320, out_features=320, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(320, 320, kernel_size=(2, 2), stride=(2, 2))
+              (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(1280, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1280)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(1280, 320, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (1): TransformerEncoderLayer(
+            (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=320, out_features=320, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(320, 320, kernel_size=(2, 2), stride=(2, 2))
+              (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(1280, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1280)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(1280, 320, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (2): TransformerEncoderLayer(
+            (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=320, out_features=320, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(320, 320, kernel_size=(2, 2), stride=(2, 2))
+              (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(1280, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1280)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(1280, 320, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (3): TransformerEncoderLayer(
+            (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=320, out_features=320, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(320, 320, kernel_size=(2, 2), stride=(2, 2))
+              (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(1280, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1280)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(1280, 320, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (4): TransformerEncoderLayer(
+            (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=320, out_features=320, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(320, 320, kernel_size=(2, 2), stride=(2, 2))
+              (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(1280, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1280)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(1280, 320, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (5): TransformerEncoderLayer(
+            (norm1): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=320, out_features=320, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+              (sr): Conv2d(320, 320, kernel_size=(2, 2), stride=(2, 2))
+              (norm): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            )
+            (norm2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(1280, 1280, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=1280)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(1280, 320, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+        )
+        (2): LayerNorm((320,), eps=1e-06, elementwise_affine=True)
+      )
+      (3): ModuleList(
+        (0): PatchEmbed(
+          (projection): Conv2d(320, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+          (norm): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+        )
+        (1): ModuleList(
+          (0): TransformerEncoderLayer(
+            (norm1): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+            )
+            (norm2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(2048, 2048, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=2048)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (1): TransformerEncoderLayer(
+            (norm1): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+            )
+            (norm2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(2048, 2048, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=2048)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+          (2): TransformerEncoderLayer(
+            (norm1): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+            (attn): EfficientMultiheadAttention(
+              (attn): MultiheadAttention(
+                (out_proj): NonDynamicallyQuantizableLinear(in_features=512, out_features=512, bias=True)
+              )
+              (proj_drop): Dropout(p=0.0, inplace=False)
+              (dropout_layer): DropPath()
+            )
+            (norm2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+            (ffn): MixFFN(
+              (activate): GELU()
+              (layers): Sequential(
+                (0): Conv2d(512, 2048, kernel_size=(1, 1), stride=(1, 1))
+                (1): Conv2d(2048, 2048, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=2048)
+                (2): GELU()
+                (3): Dropout(p=0.0, inplace=False)
+                (4): Conv2d(2048, 512, kernel_size=(1, 1), stride=(1, 1))
+                (5): Dropout(p=0.0, inplace=False)
+              )
+              (dropout_layer): DropPath()
+            )
+          )
+        )
+        (2): LayerNorm((512,), eps=1e-06, elementwise_affine=True)
+      )
+    )
+  )
+  init_cfg={'type': 'Pretrained', 'checkpoint': 'https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segformer/mit_b2_20220624-66e8bf70.pth'}
+  (decode_head): SegformerHead(
+    input_transform=multiple_select, ignore_index=255, align_corners=False
+    (loss_decode): CrossEntropyLoss(avg_non_ignore=False)
+    (conv_seg): Conv2d(256, 6, kernel_size=(1, 1), stride=(1, 1))
+    (dropout): Dropout2d(p=0.1, inplace=False)
+    (convs): ModuleList(
+      (0): Sequential(
+        (0): ConvModule(
+          (conv): Conv2d(64, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): _BatchNormXd(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (1): Identity()
+      )
+      (1): Sequential(
+        (0): ConvModule(
+          (conv): Conv2d(128, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): _BatchNormXd(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (1): MixUpSample()
+      )
+      (2): Sequential(
+        (0): ConvModule(
+          (conv): Conv2d(320, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): _BatchNormXd(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (1): MixUpSample()
+      )
+      (3): Sequential(
+        (0): ConvModule(
+          (conv): Conv2d(512, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (bn): _BatchNormXd(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (activate): ReLU(inplace=True)
+        )
+        (1): MixUpSample()
+      )
+    )
+    (fusion_conv): ConvModule(
+      (conv): Conv2d(1024, 256, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (bn): _BatchNormXd(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (activate): ReLU(inplace=True)
+    )
+  )
+  init_cfg={'type': 'Normal', 'std': 0.01, 'override': {'name': 'conv_seg'}}
+)
+2022-09-16 16:05:13,046 - mmseg - INFO - Loaded 281 images
+2022-09-16 16:05:18,900 - mmseg - INFO - Loaded 70 images
+2022-09-16 16:05:18,901 - mmseg - INFO - load checkpoint from local path: ../input/model/iter_10001.pth
+2022-09-16 16:05:23,150 - mmseg - INFO - Start running, host: root@ee7587bb501d, work_dir: /kaggle/working/work_dirs/config
+2022-09-16 16:05:23,151 - mmseg - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) PolyLrUpdaterHook                  
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) PolyLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) PolyLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2022-09-16 16:05:23,151 - mmseg - INFO - workflow: [('train', 1)], max: 10000 iters
+2022-09-16 16:05:23,151 - mmseg - INFO - Checkpoints will be saved to /kaggle/working/work_dirs/config by HardDiskBackend.
+2022-09-16 16:07:04,565 - mmseg - INFO - Iter [50/10000]	lr: 5.000e-05, eta: 5:36:08, time: 2.027, data_time: 0.029, memory: 11366, decode.loss_ce: 0.0470, decode.acc_seg: 98.1212, loss: 0.0470
+2022-09-16 16:08:20,051 - mmseg - INFO - Iter [100/10000]	lr: 5.000e-05, eta: 4:51:46, time: 1.510, data_time: 0.063, memory: 11366, decode.loss_ce: 0.0425, decode.acc_seg: 98.3367, loss: 0.0425
+2022-09-16 16:09:35,500 - mmseg - INFO - Iter [150/10000]	lr: 5.000e-05, eta: 4:36:06, time: 1.509, data_time: 0.062, memory: 11366, decode.loss_ce: 0.0500, decode.acc_seg: 98.0107, loss: 0.0500
+2022-09-16 16:10:48,630 - mmseg - INFO - Iter [200/10000]	lr: 5.000e-05, eta: 4:25:45, time: 1.463, data_time: 0.013, memory: 11366, decode.loss_ce: 0.0479, decode.acc_seg: 98.1301, loss: 0.0479
+2022-09-16 16:12:04,334 - mmseg - INFO - Iter [250/10000]	lr: 5.000e-05, eta: 4:20:43, time: 1.514, data_time: 0.066, memory: 11366, decode.loss_ce: 0.0484, decode.acc_seg: 98.0812, loss: 0.0484
+2022-09-16 16:13:20,126 - mmseg - INFO - Iter [300/10000]	lr: 5.000e-05, eta: 4:17:00, time: 1.516, data_time: 0.067, memory: 11366, decode.loss_ce: 0.0500, decode.acc_seg: 98.0372, loss: 0.0500
+2022-09-16 16:14:33,182 - mmseg - INFO - Iter [350/10000]	lr: 5.000e-05, eta: 4:12:43, time: 1.461, data_time: 0.013, memory: 11366, decode.loss_ce: 0.0483, decode.acc_seg: 97.9998, loss: 0.0483
+2022-09-16 16:15:48,877 - mmseg - INFO - Iter [400/10000]	lr: 5.000e-05, eta: 4:10:15, time: 1.514, data_time: 0.066, memory: 11366, decode.loss_ce: 0.0441, decode.acc_seg: 98.2194, loss: 0.0441
+2022-09-16 16:17:04,657 - mmseg - INFO - Iter [450/10000]	lr: 5.000e-05, eta: 4:08:06, time: 1.516, data_time: 0.069, memory: 11366, decode.loss_ce: 0.0440, decode.acc_seg: 98.2338, loss: 0.0440
+2022-09-16 16:18:20,236 - mmseg - INFO - Iter [500/10000]	lr: 5.000e-05, eta: 4:06:03, time: 1.512, data_time: 0.064, memory: 11366, decode.loss_ce: 0.0437, decode.acc_seg: 98.2616, loss: 0.0437
+2022-09-16 16:19:33,229 - mmseg - INFO - Iter [550/10000]	lr: 5.000e-05, eta: 4:03:24, time: 1.460, data_time: 0.013, memory: 11366, decode.loss_ce: 0.0415, decode.acc_seg: 98.3506, loss: 0.0415
+2022-09-16 16:20:48,804 - mmseg - INFO - Iter [600/10000]	lr: 5.000e-05, eta: 4:01:40, time: 1.511, data_time: 0.064, memory: 11366, decode.loss_ce: 0.0439, decode.acc_seg: 98.2172, loss: 0.0439
+2022-09-16 16:22:04,461 - mmseg - INFO - Iter [650/10000]	lr: 5.000e-05, eta: 4:00:02, time: 1.513, data_time: 0.062, memory: 11366, decode.loss_ce: 0.0470, decode.acc_seg: 98.1216, loss: 0.0470
+2022-09-16 16:23:17,505 - mmseg - INFO - Iter [700/10000]	lr: 5.000e-05, eta: 3:57:52, time: 1.461, data_time: 0.013, memory: 11366, decode.loss_ce: 0.0411, decode.acc_seg: 98.3444, loss: 0.0411
+2022-09-16 16:24:33,189 - mmseg - INFO - Iter [750/10000]	lr: 5.000e-05, eta: 3:56:22, time: 1.514, data_time: 0.065, memory: 11366, decode.loss_ce: 0.0437, decode.acc_seg: 98.2509, loss: 0.0437
+2022-09-16 16:25:48,739 - mmseg - INFO - Iter [800/10000]	lr: 5.000e-05, eta: 3:54:53, time: 1.511, data_time: 0.063, memory: 11366, decode.loss_ce: 0.0421, decode.acc_seg: 98.3180, loss: 0.0421
+2022-09-16 16:27:04,423 - mmseg - INFO - Iter [850/10000]	lr: 5.000e-05, eta: 3:53:27, time: 1.514, data_time: 0.064, memory: 11366, decode.loss_ce: 0.0426, decode.acc_seg: 98.2576, loss: 0.0426
+2022-09-16 16:28:17,469 - mmseg - INFO - Iter [900/10000]	lr: 5.000e-05, eta: 3:51:35, time: 1.461, data_time: 0.013, memory: 11366, decode.loss_ce: 0.0381, decode.acc_seg: 98.4661, loss: 0.0381
+2022-09-16 16:29:33,073 - mmseg - INFO - Iter [950/10000]	lr: 5.000e-05, eta: 3:50:11, time: 1.512, data_time: 0.064, memory: 11366, decode.loss_ce: 0.0421, decode.acc_seg: 98.2876, loss: 0.0421
+2022-09-16 16:30:48,654 - mmseg - INFO - Exp name: config.py
+2022-09-16 16:30:48,654 - mmseg - INFO - Iter [1000/10000]	lr: 5.000e-05, eta: 3:48:48, time: 1.512, data_time: 0.064, memory: 11366, decode.loss_ce: 0.0392, decode.acc_seg: 98.4002, loss: 0.0392
+2022-09-16 16:31:04,811 - mmseg - INFO - per class results:
+2022-09-16 16:31:04,812 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.74 | 98.75 |
+|     kidney     | 94.15 | 94.05 |
+|    prostate    | 90.26 | 91.75 |
+| largeintestine | 89.14 | 86.95 |
+|     spleen     | 83.45 | 81.21 |
+|      lung      |  34.7 | 42.92 |
++----------------+-------+-------+
+2022-09-16 16:31:04,812 - mmseg - INFO - Summary:
+2022-09-16 16:31:04,813 - mmseg - INFO - 
++-------+-------+------+
+|  aAcc | mDice | mAcc |
++-------+-------+------+
+| 97.72 | 81.74 | 82.6 |
++-------+-------+------+
+2022-09-16 16:31:04,813 - mmseg - INFO - Exp name: config.py
+2022-09-16 16:31:04,814 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9772, mDice: 0.8174, mAcc: 0.8260, Dice.background: 0.9874, Dice.kidney: 0.9415, Dice.prostate: 0.9026, Dice.largeintestine: 0.8914, Dice.spleen: 0.8345, Dice.lung: 0.3470, Acc.background: 0.9875, Acc.kidney: 0.9405, Acc.prostate: 0.9175, Acc.largeintestine: 0.8695, Acc.spleen: 0.8121, Acc.lung: 0.4292
+2022-09-16 16:32:17,765 - mmseg - INFO - Iter [1050/10000]	lr: 5.000e-05, eta: 3:49:22, time: 1.782, data_time: 0.335, memory: 13652, decode.loss_ce: 0.0378, decode.acc_seg: 98.4531, loss: 0.0378
+2022-09-16 16:33:33,439 - mmseg - INFO - Iter [1100/10000]	lr: 5.000e-05, eta: 3:47:55, time: 1.513, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0387, decode.acc_seg: 98.4445, loss: 0.0387
+2022-09-16 16:34:48,788 - mmseg - INFO - Iter [1150/10000]	lr: 5.000e-05, eta: 3:46:27, time: 1.507, data_time: 0.062, memory: 13652, decode.loss_ce: 0.0406, decode.acc_seg: 98.3642, loss: 0.0406
+2022-09-16 16:36:04,158 - mmseg - INFO - Iter [1200/10000]	lr: 5.000e-05, eta: 3:45:00, time: 1.507, data_time: 0.062, memory: 13652, decode.loss_ce: 0.0406, decode.acc_seg: 98.3531, loss: 0.0406
+2022-09-16 16:37:17,143 - mmseg - INFO - Iter [1250/10000]	lr: 5.000e-05, eta: 3:43:17, time: 1.460, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0376, decode.acc_seg: 98.4689, loss: 0.0376
+2022-09-16 16:38:32,403 - mmseg - INFO - Iter [1300/10000]	lr: 5.000e-05, eta: 3:41:52, time: 1.505, data_time: 0.061, memory: 13652, decode.loss_ce: 0.0364, decode.acc_seg: 98.5218, loss: 0.0364
+2022-09-16 16:39:47,823 - mmseg - INFO - Iter [1350/10000]	lr: 5.000e-05, eta: 3:40:28, time: 1.508, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0361, decode.acc_seg: 98.5438, loss: 0.0361
+2022-09-16 16:41:00,690 - mmseg - INFO - Iter [1400/10000]	lr: 5.000e-05, eta: 3:38:50, time: 1.457, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0367, decode.acc_seg: 98.5098, loss: 0.0367
+2022-09-16 16:42:16,206 - mmseg - INFO - Iter [1450/10000]	lr: 5.000e-05, eta: 3:37:28, time: 1.510, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0381, decode.acc_seg: 98.4815, loss: 0.0381
+2022-09-16 16:43:31,681 - mmseg - INFO - Iter [1500/10000]	lr: 5.000e-05, eta: 3:36:07, time: 1.509, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0402, decode.acc_seg: 98.3799, loss: 0.0402
+2022-09-16 16:44:47,454 - mmseg - INFO - Iter [1550/10000]	lr: 5.000e-05, eta: 3:34:48, time: 1.515, data_time: 0.070, memory: 13652, decode.loss_ce: 0.0405, decode.acc_seg: 98.3817, loss: 0.0405
+2022-09-16 16:46:00,232 - mmseg - INFO - Iter [1600/10000]	lr: 5.000e-05, eta: 3:33:14, time: 1.456, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0398, decode.acc_seg: 98.3790, loss: 0.0398
+2022-09-16 16:47:15,761 - mmseg - INFO - Iter [1650/10000]	lr: 5.000e-05, eta: 3:31:54, time: 1.511, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0335, decode.acc_seg: 98.6480, loss: 0.0335
+2022-09-16 16:48:31,246 - mmseg - INFO - Iter [1700/10000]	lr: 5.000e-05, eta: 3:30:35, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0446, decode.acc_seg: 98.1958, loss: 0.0446
+2022-09-16 16:49:44,067 - mmseg - INFO - Iter [1750/10000]	lr: 5.000e-05, eta: 3:29:03, time: 1.456, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0554, decode.acc_seg: 97.8096, loss: 0.0554
+2022-09-16 16:50:59,801 - mmseg - INFO - Iter [1800/10000]	lr: 5.000e-05, eta: 3:27:46, time: 1.515, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0400, decode.acc_seg: 98.3575, loss: 0.0400
+2022-09-16 16:52:15,492 - mmseg - INFO - Iter [1850/10000]	lr: 5.000e-05, eta: 3:26:29, time: 1.514, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0412, decode.acc_seg: 98.3415, loss: 0.0412
+2022-09-16 16:53:31,012 - mmseg - INFO - Iter [1900/10000]	lr: 5.000e-05, eta: 3:25:11, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0360, decode.acc_seg: 98.5294, loss: 0.0360
+2022-09-16 16:54:43,917 - mmseg - INFO - Iter [1950/10000]	lr: 5.000e-05, eta: 3:23:42, time: 1.458, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0359, decode.acc_seg: 98.5362, loss: 0.0359
+2022-09-16 16:55:59,243 - mmseg - INFO - Exp name: config.py
+2022-09-16 16:55:59,243 - mmseg - INFO - Iter [2000/10000]	lr: 5.000e-05, eta: 3:22:24, time: 1.507, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0379, decode.acc_seg: 98.4555, loss: 0.0379
+2022-09-16 16:56:12,459 - mmseg - INFO - per class results:
+2022-09-16 16:56:12,460 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.73 | 98.67 |
+|     kidney     | 93.73 | 94.51 |
+|    prostate    | 88.85 | 90.82 |
+| largeintestine |  89.1 |  89.7 |
+|     spleen     | 84.66 | 83.74 |
+|      lung      | 29.36 |  23.1 |
++----------------+-------+-------+
+2022-09-16 16:56:12,460 - mmseg - INFO - Summary:
+2022-09-16 16:56:12,461 - mmseg - INFO - 
++------+-------+-------+
+| aAcc | mDice |  mAcc |
++------+-------+-------+
+| 97.7 | 80.74 | 80.09 |
++------+-------+-------+
+2022-09-16 16:56:12,461 - mmseg - INFO - Exp name: config.py
+2022-09-16 16:56:12,462 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9770, mDice: 0.8074, mAcc: 0.8009, Dice.background: 0.9873, Dice.kidney: 0.9373, Dice.prostate: 0.8885, Dice.largeintestine: 0.8910, Dice.spleen: 0.8466, Dice.lung: 0.2936, Acc.background: 0.9867, Acc.kidney: 0.9451, Acc.prostate: 0.9082, Acc.largeintestine: 0.8970, Acc.spleen: 0.8374, Acc.lung: 0.2310
+2022-09-16 16:57:27,807 - mmseg - INFO - Iter [2050/10000]	lr: 5.000e-05, eta: 3:21:57, time: 1.771, data_time: 0.327, memory: 13652, decode.loss_ce: 0.0337, decode.acc_seg: 98.6154, loss: 0.0337
+2022-09-16 16:58:40,716 - mmseg - INFO - Iter [2100/10000]	lr: 5.000e-05, eta: 3:20:28, time: 1.458, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0350, decode.acc_seg: 98.5500, loss: 0.0350
+2022-09-16 16:59:56,306 - mmseg - INFO - Iter [2150/10000]	lr: 5.000e-05, eta: 3:19:10, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0340, decode.acc_seg: 98.6187, loss: 0.0340
+2022-09-16 17:01:11,960 - mmseg - INFO - Iter [2200/10000]	lr: 5.000e-05, eta: 3:17:52, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0315, decode.acc_seg: 98.7237, loss: 0.0315
+2022-09-16 17:02:27,542 - mmseg - INFO - Iter [2250/10000]	lr: 5.000e-05, eta: 3:16:34, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0391, decode.acc_seg: 98.4053, loss: 0.0391
+2022-09-16 17:03:40,547 - mmseg - INFO - Iter [2300/10000]	lr: 5.000e-05, eta: 3:15:08, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0363, decode.acc_seg: 98.5158, loss: 0.0363
+2022-09-16 17:04:56,260 - mmseg - INFO - Iter [2350/10000]	lr: 5.000e-05, eta: 3:13:51, time: 1.514, data_time: 0.069, memory: 13652, decode.loss_ce: 0.0311, decode.acc_seg: 98.7316, loss: 0.0311
+2022-09-16 17:06:12,056 - mmseg - INFO - Iter [2400/10000]	lr: 5.000e-05, eta: 3:12:34, time: 1.516, data_time: 0.069, memory: 13652, decode.loss_ce: 0.0357, decode.acc_seg: 98.5319, loss: 0.0357
+2022-09-16 17:07:24,938 - mmseg - INFO - Iter [2450/10000]	lr: 5.000e-05, eta: 3:11:08, time: 1.458, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0322, decode.acc_seg: 98.6793, loss: 0.0322
+2022-09-16 17:08:40,612 - mmseg - INFO - Iter [2500/10000]	lr: 5.000e-05, eta: 3:09:52, time: 1.513, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0301, decode.acc_seg: 98.7571, loss: 0.0301
+2022-09-16 17:09:56,211 - mmseg - INFO - Iter [2550/10000]	lr: 5.000e-05, eta: 3:08:35, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0353, decode.acc_seg: 98.5454, loss: 0.0353
+2022-09-16 17:11:11,702 - mmseg - INFO - Iter [2600/10000]	lr: 5.000e-05, eta: 3:07:17, time: 1.510, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0323, decode.acc_seg: 98.6738, loss: 0.0323
+2022-09-16 17:12:24,642 - mmseg - INFO - Iter [2650/10000]	lr: 5.000e-05, eta: 3:05:53, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0311, decode.acc_seg: 98.7136, loss: 0.0311
+2022-09-16 17:13:40,250 - mmseg - INFO - Iter [2700/10000]	lr: 5.000e-05, eta: 3:04:37, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0349, decode.acc_seg: 98.5774, loss: 0.0349
+2022-09-16 17:14:55,852 - mmseg - INFO - Iter [2750/10000]	lr: 5.000e-05, eta: 3:03:20, time: 1.512, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0347, decode.acc_seg: 98.5568, loss: 0.0347
+2022-09-16 17:16:08,699 - mmseg - INFO - Iter [2800/10000]	lr: 5.000e-05, eta: 3:01:56, time: 1.457, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0328, decode.acc_seg: 98.6490, loss: 0.0328
+2022-09-16 17:17:24,214 - mmseg - INFO - Iter [2850/10000]	lr: 5.000e-05, eta: 3:00:40, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0316, decode.acc_seg: 98.7154, loss: 0.0316
+2022-09-16 17:18:39,705 - mmseg - INFO - Iter [2900/10000]	lr: 5.000e-05, eta: 2:59:23, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0318, decode.acc_seg: 98.6814, loss: 0.0318
+2022-09-16 17:19:55,327 - mmseg - INFO - Iter [2950/10000]	lr: 5.000e-05, eta: 2:58:07, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0318, decode.acc_seg: 98.6836, loss: 0.0318
+2022-09-16 17:21:08,238 - mmseg - INFO - Exp name: config.py
+2022-09-16 17:21:08,238 - mmseg - INFO - Iter [3000/10000]	lr: 5.000e-05, eta: 2:56:44, time: 1.458, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0300, decode.acc_seg: 98.7729, loss: 0.0300
+2022-09-16 17:21:21,117 - mmseg - INFO - per class results:
+2022-09-16 17:21:21,118 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.75 | 98.94 |
+|     kidney     | 94.05 | 94.68 |
+|    prostate    | 88.57 |  87.2 |
+| largeintestine | 89.73 | 89.14 |
+|     spleen     | 83.82 | 78.88 |
+|      lung      | 24.79 | 21.06 |
++----------------+-------+-------+
+2022-09-16 17:21:21,119 - mmseg - INFO - Summary:
+2022-09-16 17:21:21,119 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.73 | 79.95 | 78.32 |
++-------+-------+-------+
+2022-09-16 17:21:21,119 - mmseg - INFO - Exp name: config.py
+2022-09-16 17:21:21,120 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9773, mDice: 0.7995, mAcc: 0.7832, Dice.background: 0.9875, Dice.kidney: 0.9405, Dice.prostate: 0.8857, Dice.largeintestine: 0.8973, Dice.spleen: 0.8382, Dice.lung: 0.2479, Acc.background: 0.9894, Acc.kidney: 0.9468, Acc.prostate: 0.8720, Acc.largeintestine: 0.8914, Acc.spleen: 0.7888, Acc.lung: 0.2106
+2022-09-16 17:22:36,823 - mmseg - INFO - Iter [3050/10000]	lr: 5.000e-05, eta: 2:55:58, time: 1.772, data_time: 0.324, memory: 13652, decode.loss_ce: 0.0322, decode.acc_seg: 98.6792, loss: 0.0322
+2022-09-16 17:23:52,384 - mmseg - INFO - Iter [3100/10000]	lr: 5.000e-05, eta: 2:54:41, time: 1.511, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0314, decode.acc_seg: 98.7029, loss: 0.0314
+2022-09-16 17:25:05,379 - mmseg - INFO - Iter [3150/10000]	lr: 5.000e-05, eta: 2:53:19, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0326, decode.acc_seg: 98.6606, loss: 0.0326
+2022-09-16 17:26:21,382 - mmseg - INFO - Iter [3200/10000]	lr: 5.000e-05, eta: 2:52:03, time: 1.520, data_time: 0.071, memory: 13652, decode.loss_ce: 0.0325, decode.acc_seg: 98.6610, loss: 0.0325
+2022-09-16 17:27:36,753 - mmseg - INFO - Iter [3250/10000]	lr: 5.000e-05, eta: 2:50:46, time: 1.507, data_time: 0.062, memory: 13652, decode.loss_ce: 0.0303, decode.acc_seg: 98.7456, loss: 0.0303
+2022-09-16 17:28:52,449 - mmseg - INFO - Iter [3300/10000]	lr: 5.000e-05, eta: 2:49:30, time: 1.514, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0300, decode.acc_seg: 98.7680, loss: 0.0300
+2022-09-16 17:30:05,297 - mmseg - INFO - Iter [3350/10000]	lr: 5.000e-05, eta: 2:48:08, time: 1.457, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0303, decode.acc_seg: 98.7596, loss: 0.0303
+2022-09-16 17:31:20,795 - mmseg - INFO - Iter [3400/10000]	lr: 5.000e-05, eta: 2:46:51, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0322, decode.acc_seg: 98.6651, loss: 0.0322
+2022-09-16 17:32:36,405 - mmseg - INFO - Iter [3450/10000]	lr: 5.000e-05, eta: 2:45:35, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0283, decode.acc_seg: 98.8275, loss: 0.0283
+2022-09-16 17:33:49,382 - mmseg - INFO - Iter [3500/10000]	lr: 5.000e-05, eta: 2:44:14, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0312, decode.acc_seg: 98.7127, loss: 0.0312
+2022-09-16 17:35:05,024 - mmseg - INFO - Iter [3550/10000]	lr: 5.000e-05, eta: 2:42:58, time: 1.513, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0289, decode.acc_seg: 98.7977, loss: 0.0289
+2022-09-16 17:36:20,379 - mmseg - INFO - Iter [3600/10000]	lr: 5.000e-05, eta: 2:41:41, time: 1.507, data_time: 0.061, memory: 13652, decode.loss_ce: 0.0312, decode.acc_seg: 98.7153, loss: 0.0312
+2022-09-16 17:37:36,058 - mmseg - INFO - Iter [3650/10000]	lr: 5.000e-05, eta: 2:40:25, time: 1.514, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0283, decode.acc_seg: 98.8263, loss: 0.0283
+2022-09-16 17:38:48,989 - mmseg - INFO - Iter [3700/10000]	lr: 5.000e-05, eta: 2:39:04, time: 1.459, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0302, decode.acc_seg: 98.7556, loss: 0.0302
+2022-09-16 17:40:04,710 - mmseg - INFO - Iter [3750/10000]	lr: 5.000e-05, eta: 2:37:49, time: 1.514, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0285, decode.acc_seg: 98.8144, loss: 0.0285
+2022-09-16 17:41:20,305 - mmseg - INFO - Iter [3800/10000]	lr: 5.000e-05, eta: 2:36:33, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0306, decode.acc_seg: 98.7376, loss: 0.0306
+2022-09-16 17:42:33,200 - mmseg - INFO - Iter [3850/10000]	lr: 5.000e-05, eta: 2:35:12, time: 1.458, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0297, decode.acc_seg: 98.7660, loss: 0.0297
+2022-09-16 17:43:48,804 - mmseg - INFO - Iter [3900/10000]	lr: 5.000e-05, eta: 2:33:56, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0305, decode.acc_seg: 98.7332, loss: 0.0305
+2022-09-16 17:45:04,352 - mmseg - INFO - Iter [3950/10000]	lr: 5.000e-05, eta: 2:32:40, time: 1.511, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0295, decode.acc_seg: 98.7816, loss: 0.0295
+2022-09-16 17:46:19,845 - mmseg - INFO - Exp name: config.py
+2022-09-16 17:46:19,846 - mmseg - INFO - Iter [4000/10000]	lr: 5.000e-05, eta: 2:31:24, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0316, decode.acc_seg: 98.6888, loss: 0.0316
+2022-09-16 17:46:32,785 - mmseg - INFO - per class results:
+2022-09-16 17:46:32,786 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   |  98.7 | 98.65 |
+|     kidney     |  94.2 | 93.79 |
+|    prostate    | 88.58 | 90.41 |
+| largeintestine | 89.84 | 90.12 |
+|     spleen     | 83.72 | 81.43 |
+|      lung      | 18.76 | 17.45 |
++----------------+-------+-------+
+2022-09-16 17:46:32,787 - mmseg - INFO - Summary:
+2022-09-16 17:46:32,787 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.64 | 78.97 | 78.64 |
++-------+-------+-------+
+2022-09-16 17:46:32,787 - mmseg - INFO - Exp name: config.py
+2022-09-16 17:46:32,788 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9764, mDice: 0.7897, mAcc: 0.7864, Dice.background: 0.9870, Dice.kidney: 0.9420, Dice.prostate: 0.8858, Dice.largeintestine: 0.8984, Dice.spleen: 0.8372, Dice.lung: 0.1876, Acc.background: 0.9865, Acc.kidney: 0.9379, Acc.prostate: 0.9041, Acc.largeintestine: 0.9012, Acc.spleen: 0.8143, Acc.lung: 0.1745
+2022-09-16 17:47:45,690 - mmseg - INFO - Iter [4050/10000]	lr: 5.000e-05, eta: 2:30:24, time: 1.717, data_time: 0.272, memory: 13652, decode.loss_ce: 0.0359, decode.acc_seg: 98.5764, loss: 0.0359
+2022-09-16 17:49:01,355 - mmseg - INFO - Iter [4100/10000]	lr: 5.000e-05, eta: 2:29:07, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0298, decode.acc_seg: 98.7892, loss: 0.0298
+2022-09-16 17:50:16,926 - mmseg - INFO - Iter [4150/10000]	lr: 5.000e-05, eta: 2:27:51, time: 1.511, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0322, decode.acc_seg: 98.6912, loss: 0.0322
+2022-09-16 17:51:29,927 - mmseg - INFO - Iter [4200/10000]	lr: 5.000e-05, eta: 2:26:32, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0300, decode.acc_seg: 98.7516, loss: 0.0300
+2022-09-16 17:52:45,791 - mmseg - INFO - Iter [4250/10000]	lr: 5.000e-05, eta: 2:25:16, time: 1.517, data_time: 0.071, memory: 13652, decode.loss_ce: 0.0285, decode.acc_seg: 98.8119, loss: 0.0285
+2022-09-16 17:54:01,353 - mmseg - INFO - Iter [4300/10000]	lr: 5.000e-05, eta: 2:24:00, time: 1.511, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0299, decode.acc_seg: 98.7685, loss: 0.0299
+2022-09-16 17:55:16,958 - mmseg - INFO - Iter [4350/10000]	lr: 5.000e-05, eta: 2:22:44, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0292, decode.acc_seg: 98.7837, loss: 0.0292
+2022-09-16 17:56:29,898 - mmseg - INFO - Iter [4400/10000]	lr: 5.000e-05, eta: 2:21:24, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0294, decode.acc_seg: 98.7918, loss: 0.0294
+2022-09-16 17:57:45,413 - mmseg - INFO - Iter [4450/10000]	lr: 5.000e-05, eta: 2:20:08, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0280, decode.acc_seg: 98.8473, loss: 0.0280
+2022-09-16 17:59:01,202 - mmseg - INFO - Iter [4500/10000]	lr: 5.000e-05, eta: 2:18:53, time: 1.516, data_time: 0.068, memory: 13652, decode.loss_ce: 0.0369, decode.acc_seg: 98.4697, loss: 0.0369
+2022-09-16 18:00:14,100 - mmseg - INFO - Iter [4550/10000]	lr: 5.000e-05, eta: 2:17:33, time: 1.458, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0392, decode.acc_seg: 98.4527, loss: 0.0392
+2022-09-16 18:01:29,466 - mmseg - INFO - Iter [4600/10000]	lr: 5.000e-05, eta: 2:16:17, time: 1.507, data_time: 0.062, memory: 13652, decode.loss_ce: 0.0336, decode.acc_seg: 98.6109, loss: 0.0336
+2022-09-16 18:02:44,994 - mmseg - INFO - Iter [4650/10000]	lr: 5.000e-05, eta: 2:15:01, time: 1.511, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0303, decode.acc_seg: 98.7534, loss: 0.0303
+2022-09-16 18:04:00,561 - mmseg - INFO - Iter [4700/10000]	lr: 5.000e-05, eta: 2:13:45, time: 1.511, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0318, decode.acc_seg: 98.7059, loss: 0.0318
+2022-09-16 18:05:13,635 - mmseg - INFO - Iter [4750/10000]	lr: 5.000e-05, eta: 2:12:27, time: 1.462, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0303, decode.acc_seg: 98.7434, loss: 0.0303
+2022-09-16 18:06:29,157 - mmseg - INFO - Iter [4800/10000]	lr: 5.000e-05, eta: 2:11:11, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0286, decode.acc_seg: 98.8053, loss: 0.0286
+2022-09-16 18:07:44,864 - mmseg - INFO - Iter [4850/10000]	lr: 5.000e-05, eta: 2:09:55, time: 1.514, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0310, decode.acc_seg: 98.7029, loss: 0.0310
+2022-09-16 18:08:57,758 - mmseg - INFO - Iter [4900/10000]	lr: 5.000e-05, eta: 2:08:37, time: 1.458, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0278, decode.acc_seg: 98.8393, loss: 0.0278
+2022-09-16 18:10:13,324 - mmseg - INFO - Iter [4950/10000]	lr: 5.000e-05, eta: 2:07:21, time: 1.511, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0287, decode.acc_seg: 98.8021, loss: 0.0287
+2022-09-16 18:11:29,033 - mmseg - INFO - Exp name: config.py
+2022-09-16 18:11:29,033 - mmseg - INFO - Iter [5000/10000]	lr: 5.000e-05, eta: 2:06:05, time: 1.514, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0296, decode.acc_seg: 98.7759, loss: 0.0296
+2022-09-16 18:11:42,356 - mmseg - INFO - per class results:
+2022-09-16 18:11:42,358 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.81 | 98.84 |
+|     kidney     | 94.15 | 95.01 |
+|    prostate    | 90.38 | 92.52 |
+| largeintestine | 89.94 | 88.43 |
+|     spleen     | 83.28 | 80.95 |
+|      lung      | 21.57 | 17.62 |
++----------------+-------+-------+
+2022-09-16 18:11:42,358 - mmseg - INFO - Summary:
+2022-09-16 18:11:42,358 - mmseg - INFO - 
++-------+-------+------+
+|  aAcc | mDice | mAcc |
++-------+-------+------+
+| 97.84 | 79.69 | 78.9 |
++-------+-------+------+
+2022-09-16 18:11:42,359 - mmseg - INFO - Exp name: config.py
+2022-09-16 18:11:42,359 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9784, mDice: 0.7969, mAcc: 0.7890, Dice.background: 0.9881, Dice.kidney: 0.9415, Dice.prostate: 0.9038, Dice.largeintestine: 0.8994, Dice.spleen: 0.8328, Dice.lung: 0.2157, Acc.background: 0.9884, Acc.kidney: 0.9501, Acc.prostate: 0.9252, Acc.largeintestine: 0.8843, Acc.spleen: 0.8095, Acc.lung: 0.1762
+2022-09-16 18:12:57,903 - mmseg - INFO - Iter [5050/10000]	lr: 5.000e-05, eta: 2:05:03, time: 1.777, data_time: 0.330, memory: 13652, decode.loss_ce: 0.0359, decode.acc_seg: 98.5685, loss: 0.0359
+2022-09-16 18:14:10,913 - mmseg - INFO - Iter [5100/10000]	lr: 5.000e-05, eta: 2:03:44, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0299, decode.acc_seg: 98.7596, loss: 0.0299
+2022-09-16 18:15:26,558 - mmseg - INFO - Iter [5150/10000]	lr: 5.000e-05, eta: 2:02:28, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0285, decode.acc_seg: 98.8145, loss: 0.0285
+2022-09-16 18:16:42,279 - mmseg - INFO - Iter [5200/10000]	lr: 5.000e-05, eta: 2:01:12, time: 1.514, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0286, decode.acc_seg: 98.8046, loss: 0.0286
+2022-09-16 18:17:55,166 - mmseg - INFO - Iter [5250/10000]	lr: 5.000e-05, eta: 1:59:54, time: 1.458, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0292, decode.acc_seg: 98.8189, loss: 0.0292
+2022-09-16 18:19:10,811 - mmseg - INFO - Iter [5300/10000]	lr: 5.000e-05, eta: 1:58:38, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0296, decode.acc_seg: 98.7886, loss: 0.0296
+2022-09-16 18:20:26,408 - mmseg - INFO - Iter [5350/10000]	lr: 5.000e-05, eta: 1:57:22, time: 1.512, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0271, decode.acc_seg: 98.8744, loss: 0.0271
+2022-09-16 18:21:42,042 - mmseg - INFO - Iter [5400/10000]	lr: 5.000e-05, eta: 1:56:07, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0276, decode.acc_seg: 98.8413, loss: 0.0276
+2022-09-16 18:22:55,000 - mmseg - INFO - Iter [5450/10000]	lr: 5.000e-05, eta: 1:54:49, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0269, decode.acc_seg: 98.8840, loss: 0.0269
+2022-09-16 18:24:10,552 - mmseg - INFO - Iter [5500/10000]	lr: 5.000e-05, eta: 1:53:33, time: 1.511, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0278, decode.acc_seg: 98.8439, loss: 0.0278
+2022-09-16 18:25:26,129 - mmseg - INFO - Iter [5550/10000]	lr: 5.000e-05, eta: 1:52:17, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0266, decode.acc_seg: 98.9137, loss: 0.0266
+2022-09-16 18:26:39,081 - mmseg - INFO - Iter [5600/10000]	lr: 5.000e-05, eta: 1:50:59, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0282, decode.acc_seg: 98.8208, loss: 0.0282
+2022-09-16 18:27:54,754 - mmseg - INFO - Iter [5650/10000]	lr: 5.000e-05, eta: 1:49:43, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0255, decode.acc_seg: 98.9469, loss: 0.0255
+2022-09-16 18:29:10,374 - mmseg - INFO - Iter [5700/10000]	lr: 5.000e-05, eta: 1:48:28, time: 1.512, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0275, decode.acc_seg: 98.8435, loss: 0.0275
+2022-09-16 18:30:25,877 - mmseg - INFO - Iter [5750/10000]	lr: 5.000e-05, eta: 1:47:12, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0253, decode.acc_seg: 98.9478, loss: 0.0253
+2022-09-16 18:31:38,903 - mmseg - INFO - Iter [5800/10000]	lr: 5.000e-05, eta: 1:45:54, time: 1.461, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0272, decode.acc_seg: 98.8577, loss: 0.0272
+2022-09-16 18:32:54,681 - mmseg - INFO - Iter [5850/10000]	lr: 5.000e-05, eta: 1:44:39, time: 1.516, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0338, decode.acc_seg: 98.6736, loss: 0.0338
+2022-09-16 18:34:10,219 - mmseg - INFO - Iter [5900/10000]	lr: 5.000e-05, eta: 1:43:23, time: 1.511, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0381, decode.acc_seg: 98.4869, loss: 0.0381
+2022-09-16 18:35:23,193 - mmseg - INFO - Iter [5950/10000]	lr: 5.000e-05, eta: 1:42:05, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0338, decode.acc_seg: 98.6471, loss: 0.0338
+2022-09-16 18:36:38,813 - mmseg - INFO - Exp name: config.py
+2022-09-16 18:36:38,813 - mmseg - INFO - Iter [6000/10000]	lr: 5.000e-05, eta: 1:40:50, time: 1.512, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0299, decode.acc_seg: 98.7780, loss: 0.0299
+2022-09-16 18:36:52,208 - mmseg - INFO - per class results:
+2022-09-16 18:36:52,209 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   |  98.7 | 98.73 |
+|     kidney     | 93.03 | 95.83 |
+|    prostate    | 89.72 | 90.19 |
+| largeintestine | 89.58 |  88.5 |
+|     spleen     | 81.67 | 79.37 |
+|      lung      | 22.72 | 23.65 |
++----------------+-------+-------+
+2022-09-16 18:36:52,209 - mmseg - INFO - Summary:
+2022-09-16 18:36:52,210 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.65 | 79.24 | 79.38 |
++-------+-------+-------+
+2022-09-16 18:36:52,210 - mmseg - INFO - Exp name: config.py
+2022-09-16 18:36:52,210 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9765, mDice: 0.7924, mAcc: 0.7938, Dice.background: 0.9870, Dice.kidney: 0.9303, Dice.prostate: 0.8972, Dice.largeintestine: 0.8958, Dice.spleen: 0.8167, Dice.lung: 0.2272, Acc.background: 0.9873, Acc.kidney: 0.9583, Acc.prostate: 0.9019, Acc.largeintestine: 0.8850, Acc.spleen: 0.7937, Acc.lung: 0.2365
+2022-09-16 18:38:07,676 - mmseg - INFO - Iter [6050/10000]	lr: 5.000e-05, eta: 1:39:43, time: 1.777, data_time: 0.331, memory: 13652, decode.loss_ce: 0.0272, decode.acc_seg: 98.8703, loss: 0.0272
+2022-09-16 18:39:23,343 - mmseg - INFO - Iter [6100/10000]	lr: 5.000e-05, eta: 1:38:27, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0282, decode.acc_seg: 98.8357, loss: 0.0282
+2022-09-16 18:40:36,366 - mmseg - INFO - Iter [6150/10000]	lr: 5.000e-05, eta: 1:37:10, time: 1.460, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0277, decode.acc_seg: 98.8559, loss: 0.0277
+2022-09-16 18:41:52,021 - mmseg - INFO - Iter [6200/10000]	lr: 5.000e-05, eta: 1:35:54, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0266, decode.acc_seg: 98.8809, loss: 0.0266
+2022-09-16 18:43:07,633 - mmseg - INFO - Iter [6250/10000]	lr: 5.000e-05, eta: 1:34:38, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0251, decode.acc_seg: 98.9582, loss: 0.0251
+2022-09-16 18:44:20,666 - mmseg - INFO - Iter [6300/10000]	lr: 5.000e-05, eta: 1:33:21, time: 1.461, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0262, decode.acc_seg: 98.9073, loss: 0.0262
+2022-09-16 18:45:36,306 - mmseg - INFO - Iter [6350/10000]	lr: 5.000e-05, eta: 1:32:05, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0248, decode.acc_seg: 98.9598, loss: 0.0248
+2022-09-16 18:46:51,946 - mmseg - INFO - Iter [6400/10000]	lr: 5.000e-05, eta: 1:30:49, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0269, decode.acc_seg: 98.8772, loss: 0.0269
+2022-09-16 18:48:07,458 - mmseg - INFO - Iter [6450/10000]	lr: 5.000e-05, eta: 1:29:34, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0241, decode.acc_seg: 98.9888, loss: 0.0241
+2022-09-16 18:49:20,530 - mmseg - INFO - Iter [6500/10000]	lr: 5.000e-05, eta: 1:28:16, time: 1.461, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0257, decode.acc_seg: 98.9223, loss: 0.0257
+2022-09-16 18:50:36,117 - mmseg - INFO - Iter [6550/10000]	lr: 5.000e-05, eta: 1:27:01, time: 1.512, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0248, decode.acc_seg: 98.9617, loss: 0.0248
+2022-09-16 18:51:51,681 - mmseg - INFO - Iter [6600/10000]	lr: 5.000e-05, eta: 1:25:45, time: 1.511, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0258, decode.acc_seg: 98.9149, loss: 0.0258
+2022-09-16 18:53:04,712 - mmseg - INFO - Iter [6650/10000]	lr: 5.000e-05, eta: 1:24:28, time: 1.461, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0260, decode.acc_seg: 98.9098, loss: 0.0260
+2022-09-16 18:54:20,469 - mmseg - INFO - Iter [6700/10000]	lr: 5.000e-05, eta: 1:23:12, time: 1.515, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0271, decode.acc_seg: 98.8713, loss: 0.0271
+2022-09-16 18:55:36,079 - mmseg - INFO - Iter [6750/10000]	lr: 5.000e-05, eta: 1:21:57, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0255, decode.acc_seg: 98.9297, loss: 0.0255
+2022-09-16 18:56:51,965 - mmseg - INFO - Iter [6800/10000]	lr: 5.000e-05, eta: 1:20:41, time: 1.518, data_time: 0.068, memory: 13652, decode.loss_ce: 0.0247, decode.acc_seg: 98.9711, loss: 0.0247
+2022-09-16 18:58:04,816 - mmseg - INFO - Iter [6850/10000]	lr: 5.000e-05, eta: 1:19:24, time: 1.457, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0254, decode.acc_seg: 98.9335, loss: 0.0254
+2022-09-16 18:59:20,557 - mmseg - INFO - Iter [6900/10000]	lr: 5.000e-05, eta: 1:18:09, time: 1.515, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0250, decode.acc_seg: 98.9504, loss: 0.0250
+2022-09-16 19:00:36,215 - mmseg - INFO - Iter [6950/10000]	lr: 5.000e-05, eta: 1:16:53, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0263, decode.acc_seg: 98.8947, loss: 0.0263
+2022-09-16 19:01:49,223 - mmseg - INFO - Exp name: config.py
+2022-09-16 19:01:49,223 - mmseg - INFO - Iter [7000/10000]	lr: 5.000e-05, eta: 1:15:36, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0230, decode.acc_seg: 99.0343, loss: 0.0230
+2022-09-16 19:02:02,141 - mmseg - INFO - per class results:
+2022-09-16 19:02:02,142 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.75 | 98.86 |
+|     kidney     | 94.39 |  94.9 |
+|    prostate    |  89.1 | 89.78 |
+| largeintestine | 89.65 |  87.7 |
+|     spleen     | 83.35 | 80.87 |
+|      lung      | 27.04 | 24.23 |
++----------------+-------+-------+
+2022-09-16 19:02:02,142 - mmseg - INFO - Summary:
+2022-09-16 19:02:02,142 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.74 | 80.38 | 79.39 |
++-------+-------+-------+
+2022-09-16 19:02:02,143 - mmseg - INFO - Exp name: config.py
+2022-09-16 19:02:02,143 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9774, mDice: 0.8038, mAcc: 0.7939, Dice.background: 0.9875, Dice.kidney: 0.9439, Dice.prostate: 0.8910, Dice.largeintestine: 0.8965, Dice.spleen: 0.8335, Dice.lung: 0.2704, Acc.background: 0.9886, Acc.kidney: 0.9490, Acc.prostate: 0.8978, Acc.largeintestine: 0.8770, Acc.spleen: 0.8087, Acc.lung: 0.2423
+2022-09-16 19:03:17,859 - mmseg - INFO - Iter [7050/10000]	lr: 5.000e-05, eta: 1:14:26, time: 1.773, data_time: 0.323, memory: 13652, decode.loss_ce: 0.0245, decode.acc_seg: 98.9655, loss: 0.0245
+2022-09-16 19:04:33,293 - mmseg - INFO - Iter [7100/10000]	lr: 5.000e-05, eta: 1:13:10, time: 1.509, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0260, decode.acc_seg: 98.9003, loss: 0.0260
+2022-09-16 19:05:48,933 - mmseg - INFO - Iter [7150/10000]	lr: 5.000e-05, eta: 1:11:55, time: 1.513, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0255, decode.acc_seg: 98.9376, loss: 0.0255
+2022-09-16 19:07:01,834 - mmseg - INFO - Iter [7200/10000]	lr: 5.000e-05, eta: 1:10:38, time: 1.458, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0237, decode.acc_seg: 98.9994, loss: 0.0237
+2022-09-16 19:08:17,452 - mmseg - INFO - Iter [7250/10000]	lr: 5.000e-05, eta: 1:09:22, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0257, decode.acc_seg: 98.9254, loss: 0.0257
+2022-09-16 19:09:33,084 - mmseg - INFO - Iter [7300/10000]	lr: 5.000e-05, eta: 1:08:06, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0227, decode.acc_seg: 99.0442, loss: 0.0227
+2022-09-16 19:10:46,069 - mmseg - INFO - Iter [7350/10000]	lr: 5.000e-05, eta: 1:06:50, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0259, decode.acc_seg: 98.9150, loss: 0.0259
+2022-09-16 19:12:01,679 - mmseg - INFO - Iter [7400/10000]	lr: 5.000e-05, eta: 1:05:34, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0247, decode.acc_seg: 98.9617, loss: 0.0247
+2022-09-16 19:13:17,177 - mmseg - INFO - Iter [7450/10000]	lr: 5.000e-05, eta: 1:04:18, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0262, decode.acc_seg: 98.8989, loss: 0.0262
+2022-09-16 19:14:32,655 - mmseg - INFO - Iter [7500/10000]	lr: 5.000e-05, eta: 1:03:03, time: 1.510, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0233, decode.acc_seg: 99.0195, loss: 0.0233
+2022-09-16 19:15:45,591 - mmseg - INFO - Iter [7550/10000]	lr: 5.000e-05, eta: 1:01:46, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0250, decode.acc_seg: 98.9512, loss: 0.0250
+2022-09-16 19:17:01,281 - mmseg - INFO - Iter [7600/10000]	lr: 5.000e-05, eta: 1:00:30, time: 1.514, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0243, decode.acc_seg: 98.9880, loss: 0.0243
+2022-09-16 19:18:16,689 - mmseg - INFO - Iter [7650/10000]	lr: 5.000e-05, eta: 0:59:15, time: 1.508, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0297, decode.acc_seg: 98.7939, loss: 0.0297
+2022-09-16 19:19:29,564 - mmseg - INFO - Iter [7700/10000]	lr: 5.000e-05, eta: 0:57:58, time: 1.457, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0275, decode.acc_seg: 98.8706, loss: 0.0275
+2022-09-16 19:20:45,241 - mmseg - INFO - Iter [7750/10000]	lr: 5.000e-05, eta: 0:56:43, time: 1.514, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0266, decode.acc_seg: 98.8756, loss: 0.0266
+2022-09-16 19:22:00,678 - mmseg - INFO - Iter [7800/10000]	lr: 5.000e-05, eta: 0:55:27, time: 1.509, data_time: 0.062, memory: 13652, decode.loss_ce: 0.0248, decode.acc_seg: 98.9618, loss: 0.0248
+2022-09-16 19:23:16,407 - mmseg - INFO - Iter [7850/10000]	lr: 5.000e-05, eta: 0:54:11, time: 1.515, data_time: 0.067, memory: 13652, decode.loss_ce: 0.0260, decode.acc_seg: 98.9048, loss: 0.0260
+2022-09-16 19:24:29,333 - mmseg - INFO - Iter [7900/10000]	lr: 5.000e-05, eta: 0:52:55, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0232, decode.acc_seg: 99.0243, loss: 0.0232
+2022-09-16 19:25:45,074 - mmseg - INFO - Iter [7950/10000]	lr: 5.000e-05, eta: 0:51:39, time: 1.515, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0251, decode.acc_seg: 98.9446, loss: 0.0251
+2022-09-16 19:27:00,999 - mmseg - INFO - Exp name: config.py
+2022-09-16 19:27:00,999 - mmseg - INFO - Iter [8000/10000]	lr: 5.000e-05, eta: 0:50:24, time: 1.518, data_time: 0.068, memory: 13652, decode.loss_ce: 0.0242, decode.acc_seg: 98.9788, loss: 0.0242
+2022-09-16 19:27:14,188 - mmseg - INFO - per class results:
+2022-09-16 19:27:14,189 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   |  98.7 |  99.0 |
+|     kidney     | 94.37 | 93.58 |
+|    prostate    | 87.57 | 84.59 |
+| largeintestine | 89.48 | 88.02 |
+|     spleen     | 82.61 | 77.97 |
+|      lung      | 22.96 | 20.17 |
++----------------+-------+-------+
+2022-09-16 19:27:14,189 - mmseg - INFO - Summary:
+2022-09-16 19:27:14,190 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.63 | 79.28 | 77.22 |
++-------+-------+-------+
+2022-09-16 19:27:14,190 - mmseg - INFO - Exp name: config.py
+2022-09-16 19:27:14,190 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9763, mDice: 0.7928, mAcc: 0.7722, Dice.background: 0.9870, Dice.kidney: 0.9437, Dice.prostate: 0.8757, Dice.largeintestine: 0.8948, Dice.spleen: 0.8261, Dice.lung: 0.2296, Acc.background: 0.9900, Acc.kidney: 0.9358, Acc.prostate: 0.8459, Acc.largeintestine: 0.8802, Acc.spleen: 0.7797, Acc.lung: 0.2017
+2022-09-16 19:28:27,151 - mmseg - INFO - Iter [8050/10000]	lr: 5.000e-05, eta: 0:49:11, time: 1.723, data_time: 0.277, memory: 13652, decode.loss_ce: 0.0234, decode.acc_seg: 99.0131, loss: 0.0234
+2022-09-16 19:29:42,689 - mmseg - INFO - Iter [8100/10000]	lr: 5.000e-05, eta: 0:47:55, time: 1.511, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0246, decode.acc_seg: 98.9648, loss: 0.0246
+2022-09-16 19:30:58,138 - mmseg - INFO - Iter [8150/10000]	lr: 5.000e-05, eta: 0:46:39, time: 1.509, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0245, decode.acc_seg: 98.9750, loss: 0.0245
+2022-09-16 19:32:13,628 - mmseg - INFO - Iter [8200/10000]	lr: 5.000e-05, eta: 0:45:24, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0220, decode.acc_seg: 99.0709, loss: 0.0220
+2022-09-16 19:33:26,578 - mmseg - INFO - Iter [8250/10000]	lr: 5.000e-05, eta: 0:44:07, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0284, decode.acc_seg: 98.8587, loss: 0.0284
+2022-09-16 19:34:42,107 - mmseg - INFO - Iter [8300/10000]	lr: 5.000e-05, eta: 0:42:52, time: 1.511, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0314, decode.acc_seg: 98.6890, loss: 0.0314
+2022-09-16 19:35:57,721 - mmseg - INFO - Iter [8350/10000]	lr: 5.000e-05, eta: 0:41:36, time: 1.512, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0260, decode.acc_seg: 98.9042, loss: 0.0260
+2022-09-16 19:37:10,656 - mmseg - INFO - Iter [8400/10000]	lr: 5.000e-05, eta: 0:40:20, time: 1.459, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0245, decode.acc_seg: 98.9726, loss: 0.0245
+2022-09-16 19:38:26,244 - mmseg - INFO - Iter [8450/10000]	lr: 5.000e-05, eta: 0:39:04, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0244, decode.acc_seg: 98.9838, loss: 0.0244
+2022-09-16 19:39:41,748 - mmseg - INFO - Iter [8500/10000]	lr: 5.000e-05, eta: 0:37:49, time: 1.510, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0222, decode.acc_seg: 99.0725, loss: 0.0222
+2022-09-16 19:40:57,101 - mmseg - INFO - Iter [8550/10000]	lr: 5.000e-05, eta: 0:36:33, time: 1.507, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0249, decode.acc_seg: 98.9550, loss: 0.0249
+2022-09-16 19:42:10,108 - mmseg - INFO - Iter [8600/10000]	lr: 5.000e-05, eta: 0:35:17, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0242, decode.acc_seg: 98.9908, loss: 0.0242
+2022-09-16 19:43:25,751 - mmseg - INFO - Iter [8650/10000]	lr: 5.000e-05, eta: 0:34:01, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0248, decode.acc_seg: 98.9621, loss: 0.0248
+2022-09-16 19:44:41,473 - mmseg - INFO - Iter [8700/10000]	lr: 5.000e-05, eta: 0:32:46, time: 1.514, data_time: 0.069, memory: 13652, decode.loss_ce: 0.0238, decode.acc_seg: 99.0165, loss: 0.0238
+2022-09-16 19:45:54,434 - mmseg - INFO - Iter [8750/10000]	lr: 5.000e-05, eta: 0:31:30, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0242, decode.acc_seg: 98.9853, loss: 0.0242
+2022-09-16 19:47:10,246 - mmseg - INFO - Iter [8800/10000]	lr: 5.000e-05, eta: 0:30:14, time: 1.516, data_time: 0.070, memory: 13652, decode.loss_ce: 0.0224, decode.acc_seg: 99.0539, loss: 0.0224
+2022-09-16 19:48:25,853 - mmseg - INFO - Iter [8850/10000]	lr: 5.000e-05, eta: 0:28:58, time: 1.512, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0247, decode.acc_seg: 98.9544, loss: 0.0247
+2022-09-16 19:49:41,895 - mmseg - INFO - Iter [8900/10000]	lr: 5.000e-05, eta: 0:27:43, time: 1.521, data_time: 0.072, memory: 13652, decode.loss_ce: 0.0226, decode.acc_seg: 99.0466, loss: 0.0226
+2022-09-16 19:50:55,024 - mmseg - INFO - Iter [8950/10000]	lr: 5.000e-05, eta: 0:26:27, time: 1.463, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0236, decode.acc_seg: 99.0088, loss: 0.0236
+2022-09-16 19:52:10,716 - mmseg - INFO - Exp name: config.py
+2022-09-16 19:52:10,716 - mmseg - INFO - Iter [9000/10000]	lr: 5.000e-05, eta: 0:25:11, time: 1.514, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0245, decode.acc_seg: 98.9680, loss: 0.0245
+2022-09-16 19:52:23,886 - mmseg - INFO - per class results:
+2022-09-16 19:52:23,887 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.76 | 98.81 |
+|     kidney     | 94.16 | 94.19 |
+|    prostate    | 90.44 | 92.09 |
+| largeintestine | 89.98 | 88.19 |
+|     spleen     | 78.86 | 77.17 |
+|      lung      | 25.83 | 23.32 |
++----------------+-------+-------+
+2022-09-16 19:52:23,887 - mmseg - INFO - Summary:
+2022-09-16 19:52:23,887 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.74 | 79.67 | 78.96 |
++-------+-------+-------+
+2022-09-16 19:52:23,888 - mmseg - INFO - Exp name: config.py
+2022-09-16 19:52:23,888 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9774, mDice: 0.7967, mAcc: 0.7896, Dice.background: 0.9876, Dice.kidney: 0.9416, Dice.prostate: 0.9044, Dice.largeintestine: 0.8998, Dice.spleen: 0.7886, Dice.lung: 0.2583, Acc.background: 0.9881, Acc.kidney: 0.9419, Acc.prostate: 0.9209, Acc.largeintestine: 0.8819, Acc.spleen: 0.7717, Acc.lung: 0.2332
+2022-09-16 19:53:39,369 - mmseg - INFO - Iter [9050/10000]	lr: 5.000e-05, eta: 0:23:57, time: 1.773, data_time: 0.327, memory: 13652, decode.loss_ce: 0.0222, decode.acc_seg: 99.0629, loss: 0.0222
+2022-09-16 19:54:52,475 - mmseg - INFO - Iter [9100/10000]	lr: 5.000e-05, eta: 0:22:41, time: 1.462, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0252, decode.acc_seg: 98.9346, loss: 0.0252
+2022-09-16 19:56:08,200 - mmseg - INFO - Iter [9150/10000]	lr: 5.000e-05, eta: 0:21:26, time: 1.514, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0235, decode.acc_seg: 99.0052, loss: 0.0235
+2022-09-16 19:57:23,830 - mmseg - INFO - Iter [9200/10000]	lr: 5.000e-05, eta: 0:20:10, time: 1.513, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0223, decode.acc_seg: 99.0567, loss: 0.0223
+2022-09-16 19:58:39,762 - mmseg - INFO - Iter [9250/10000]	lr: 5.000e-05, eta: 0:18:54, time: 1.519, data_time: 0.072, memory: 13652, decode.loss_ce: 0.0218, decode.acc_seg: 99.0834, loss: 0.0218
+2022-09-16 19:59:52,804 - mmseg - INFO - Iter [9300/10000]	lr: 5.000e-05, eta: 0:17:38, time: 1.461, data_time: 0.014, memory: 13652, decode.loss_ce: 0.0237, decode.acc_seg: 98.9997, loss: 0.0237
+2022-09-16 20:01:08,495 - mmseg - INFO - Iter [9350/10000]	lr: 5.000e-05, eta: 0:16:23, time: 1.514, data_time: 0.065, memory: 13652, decode.loss_ce: 0.0218, decode.acc_seg: 99.0789, loss: 0.0218
+2022-09-16 20:02:24,242 - mmseg - INFO - Iter [9400/10000]	lr: 5.000e-05, eta: 0:15:07, time: 1.515, data_time: 0.068, memory: 13652, decode.loss_ce: 0.0243, decode.acc_seg: 98.9775, loss: 0.0243
+2022-09-16 20:03:37,180 - mmseg - INFO - Iter [9450/10000]	lr: 5.000e-05, eta: 0:13:51, time: 1.459, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0225, decode.acc_seg: 99.0520, loss: 0.0225
+2022-09-16 20:04:52,895 - mmseg - INFO - Iter [9500/10000]	lr: 5.000e-05, eta: 0:12:36, time: 1.514, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0229, decode.acc_seg: 99.0287, loss: 0.0229
+2022-09-16 20:06:08,364 - mmseg - INFO - Iter [9550/10000]	lr: 5.000e-05, eta: 0:11:20, time: 1.509, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0212, decode.acc_seg: 99.1036, loss: 0.0212
+2022-09-16 20:07:23,876 - mmseg - INFO - Iter [9600/10000]	lr: 5.000e-05, eta: 0:10:05, time: 1.510, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0268, decode.acc_seg: 98.8820, loss: 0.0268
+2022-09-16 20:08:36,741 - mmseg - INFO - Iter [9650/10000]	lr: 5.000e-05, eta: 0:08:49, time: 1.457, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0275, decode.acc_seg: 98.9342, loss: 0.0275
+2022-09-16 20:09:52,156 - mmseg - INFO - Iter [9700/10000]	lr: 5.000e-05, eta: 0:07:33, time: 1.508, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0262, decode.acc_seg: 98.9098, loss: 0.0262
+2022-09-16 20:11:07,725 - mmseg - INFO - Iter [9750/10000]	lr: 5.000e-05, eta: 0:06:18, time: 1.511, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0226, decode.acc_seg: 99.0501, loss: 0.0226
+2022-09-16 20:12:20,706 - mmseg - INFO - Iter [9800/10000]	lr: 5.000e-05, eta: 0:05:02, time: 1.460, data_time: 0.013, memory: 13652, decode.loss_ce: 0.0224, decode.acc_seg: 99.0514, loss: 0.0224
+2022-09-16 20:13:36,295 - mmseg - INFO - Iter [9850/10000]	lr: 5.000e-05, eta: 0:03:46, time: 1.512, data_time: 0.066, memory: 13652, decode.loss_ce: 0.0217, decode.acc_seg: 99.0864, loss: 0.0217
+2022-09-16 20:14:51,926 - mmseg - INFO - Iter [9900/10000]	lr: 5.000e-05, eta: 0:02:31, time: 1.513, data_time: 0.064, memory: 13652, decode.loss_ce: 0.0214, decode.acc_seg: 99.0960, loss: 0.0214
+2022-09-16 20:16:07,363 - mmseg - INFO - Iter [9950/10000]	lr: 5.000e-05, eta: 0:01:15, time: 1.509, data_time: 0.063, memory: 13652, decode.loss_ce: 0.0249, decode.acc_seg: 98.9458, loss: 0.0249
+2022-09-16 20:17:20,253 - mmseg - INFO - Saving checkpoint at 10000 iterations
+2022-09-16 20:17:21,445 - mmseg - INFO - Exp name: config.py
+2022-09-16 20:17:21,446 - mmseg - INFO - Iter [10000/10000]	lr: 5.000e-05, eta: 0:00:00, time: 1.482, data_time: 0.012, memory: 13652, decode.loss_ce: 0.0231, decode.acc_seg: 99.0179, loss: 0.0231
+2022-09-16 20:17:34,636 - mmseg - INFO - per class results:
+2022-09-16 20:17:34,637 - mmseg - INFO - 
++----------------+-------+-------+
+|     Class      |  Dice |  Acc  |
++----------------+-------+-------+
+|   background   | 98.77 | 98.94 |
+|     kidney     | 94.05 | 94.69 |
+|    prostate    | 89.59 | 89.25 |
+| largeintestine | 89.96 | 88.58 |
+|     spleen     | 82.02 | 77.73 |
+|      lung      | 21.38 | 18.28 |
++----------------+-------+-------+
+2022-09-16 20:17:34,637 - mmseg - INFO - Summary:
+2022-09-16 20:17:34,637 - mmseg - INFO - 
++-------+-------+-------+
+|  aAcc | mDice |  mAcc |
++-------+-------+-------+
+| 97.77 |  79.3 | 77.91 |
++-------+-------+-------+
+2022-09-16 20:17:34,638 - mmseg - INFO - Exp name: config.py
+2022-09-16 20:17:34,638 - mmseg - INFO - Iter(val) [70]	aAcc: 0.9777, mDice: 0.7930, mAcc: 0.7791, Dice.background: 0.9877, Dice.kidney: 0.9405, Dice.prostate: 0.8959, Dice.largeintestine: 0.8996, Dice.spleen: 0.8202, Dice.lung: 0.2138, Acc.background: 0.9894, Acc.kidney: 0.9469, Acc.prostate: 0.8925, Acc.largeintestine: 0.8858, Acc.spleen: 0.7773, Acc.lung: 0.1828
